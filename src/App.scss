@@ -1,0 +1,102 @@
+@import "~antd/dist/antd.css";
+@import url("https://fonts.googleapis.com/css2?family=Anton&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Roboto&display=swap");
+p,
+label {
+  font-family: "Roboto", sans-serif;
+}
+.App {
+  text-align: center;
+  background-image: url(./static/image/Background.png);
+  background-position: top;
+  background-repeat: no-repeat;
+  font-family: "Anton", sans-serif;
+  .btn-header {
+    padding-top: 2rem;
+    z-index: 2;
+    position: relative;
+    div {
+      display: flex;
+      align-items: flex-start;
+      position: relative;
+      img {
+        width: 155px;
+      }
+      span {
+        position: absolute;
+        color: #f3e88c;
+        left: 45%;
+        top: 42%;
+      }
+      #userName {
+        position: absolute;
+        color: #f3e88c;
+        left: 10%;
+        top: 48%;
+      }
+    }
+    div:last-child {
+      align-items: flex-end;
+      flex-direction: column;
+    }
+  }
+  .game-box {
+    position: relative;
+    width: 500px;
+    z-index: 1;
+    margin: 0 auto;
+    .wheel-background {
+      position: absolute;
+      top: -118px;
+      width: 147%;
+      z-index: -1;
+      left: -118px;
+    }
+    .wheel-border {
+      position: absolute;
+      top: -118px;
+      width: 147%;
+      z-index: 1;
+      left: -118px;
+    }
+    .wheel-button {
+      position: absolute;
+      top: 34.5%;
+      left: 34.5%;
+      z-index: 2;
+      pointer-events: all;
+      width: 155px;
+    }
+    .disable-spin {
+      pointer-events: none;
+    }
+    // effect
+    .wheel-button:active {
+      transform: scale(0.95);
+    }
+    .model {
+      position: absolute;
+      top: -112px;
+      left: -400px;
+      z-index: 2;
+    }
+  }
+  .btn-homepage {
+    padding: 10.5rem 0 5rem 0;
+    display: flex;
+    // justify-content: space-around;
+    div {
+      img {
+        width: 100%;
+        position: relative;
+        top: -50px;
+      }
+    }
+  }
+  .start-btn {
+    display: none;
+  }
+  .btn-pointer {
+    cursor: pointer;
+  }
+}
