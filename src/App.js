@@ -1,27 +1,4 @@
-<<<<<<< HEAD
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
-
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-=======
-import React, { useState, useEffect } from "react";
+import React, { useState} from "react";
 import Roulette from "react-roulette-game";
 import { Row, Col } from "antd";
 import { img } from "./utils/importImg";
@@ -105,10 +82,10 @@ function App() {
         handleOffModal={handleOffModal}
       />
       <Row justify="center" className="btn-header">
-        <Col span={6}>
+        <Col  xl={{span:7}} lg={{span:9}} md={{span:11}}>
           {printIsLogin()}
         </Col>
-        <Col span={6}>
+        <Col  xl={{span:7}} lg={{span:9}} md={{span:11}}>
           <div>
             <img src={img["btn_number_row.png"]} />
             <span>1000 lượt</span>
@@ -136,7 +113,6 @@ function App() {
           <img src={img["btn_fanpage.png"]} className='btn-pointer'/>
         </Col>
       </Row>
->>>>>>> 234d8095946a2c7f3c43866e1505d72173c5d6ba
     </div>
   );
 }
