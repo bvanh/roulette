@@ -1,15 +1,16 @@
 import React from "react";
-import { Modal, Form, Input, Button, Checkbox } from "antd";
+import { Modal, Form, Input, Button, Checkbox, Alert } from "antd";
 import "../static/style/modal.scss";
 import typeModal from "../utils/tyleModal";
-import { img } from "../utils/importImg";
-const { RULE, HISTORY, LOGIN } = typeModal;
+import { imgRewards, img } from "../utils/importImg";
+const { RULE, HISTORY, LOGIN, ALERT_REWARD } = typeModal;
 const layout = {
     labelCol: { span: 4 },
     wrapperCol: { span: 16 },
 };
 const FormAlert = (props) => {
     const { visible, isModal } = props.indexModal;
+    const { prize, rewards } = props;
     const onFinish = (values) => {
         console.log("Success:", values);
     };
@@ -19,6 +20,13 @@ const FormAlert = (props) => {
     };
     const printModal = () => {
         switch (isModal) {
+            case ALERT_REWARD:
+                return (
+                    <div className='alert-rewards'>
+                        <img src={imgRewards[`${prize}.png`]} />
+                        <h2>{rewards[prize]}</h2>
+                    </div>
+                )
             case RULE:
                 return (
                     <>
@@ -94,6 +102,7 @@ const FormAlert = (props) => {
                 onOk={() => props.handleOffModal()}
                 onCancel={() => props.handleOffModal()}
                 footer={null}
+                style={{ top: 200 }}
             >
                 {printModal()}
             </Modal>

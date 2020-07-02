@@ -1,5 +1,14 @@
+$mobile-width: 767px;
+@mixin mobile {
+  @media (max-width: #{$mobile-width}) {
+    @content;
+  }
+}
 .Modal {
   width: 720px !important;
+  @include mobile() {
+    top: 100px !important;
+  }
   .ant-modal-content {
     // background-image: url(../image/background_form.png);
     background-color: #000940;
@@ -29,10 +38,23 @@
         text-align: center;
         top: -43px;
         position: relative;
+        @include mobile() {
+          top: -38px;
+          img {
+            width: 75%;
+          }
+        }
       }
     }
     .ant-modal-body {
       padding: 0 32px 32px;
+      .alert-rewards {
+        text-align: center;
+        h2 {
+          color: #f3e88c;
+          margin-top: 1rem;
+        }
+      }
     }
     .ant-modal-close {
       position: absolute;
@@ -43,7 +65,7 @@
       justify-content: space-around;
       .ant-form-item-label {
         text-align: left;
-        label{
+        label {
           color: white;
         }
       }
