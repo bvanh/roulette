@@ -10,9 +10,11 @@ const layout = {
 };
 const FormAlert = (props) => {
     const { visible, isModal } = props.indexModal;
-    const { prize, rewards } = props;
+    const { prize, rewards, indexLogin } = props;
     const onFinish = (values) => {
-        console.log("Success:", values);
+        props.setIndexLogin({ isLogin: true, userName: values.username });
+        props.handleOffModal();
+        // console.log("Success:", values);
     };
 
     const onFinishFailed = (errorInfo) => {

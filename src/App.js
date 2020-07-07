@@ -1,9 +1,10 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import Roulette from "react-roulette-game";
 import { Row, Col } from "antd";
 import { img } from "./utils/importImg";
 import FormAlert from "./components/modal";
-import typeModal from './utils/tyleModal'
+import typeModal from './utils/tyleModal';
+import { login,getInfoCharacter } from './utils/login'
 import "./App.scss";
 let roulette_img_on_highlight = img["wheel.png"];
 let roulette_img_under_highlight = img["wheel.png"];
@@ -29,14 +30,22 @@ function App() {
     visible: false
   });
   const [prize, setPrize] = useState(3);
-  const [isLogin, setIsLogin] = useState(false);
+  const [indexLogin, setIndexLogin] = useState({
+    isLogin: false,
+    userName: "hamchoi",
+    password: '12345678'
+  });
   const [reset, setReset] = useState(false);
   const [rewards, setRewards] = useState([])
   const { isSpin, disableButton } = mustSpin;
+  const { isLogin, userName, password } = indexLogin;
   let set_prize = prize;
   let start = isSpin;
   useEffect(() => {
-    setRewards(rewards_arr)
+    setRewards(rewards_arr);
+    // login({ 'username': userName, "password": password });
+    getInfoCharacter();
+    
   }, [])
   const roulette_props = {
     roulette_img_under_highlight,
@@ -69,14 +78,14 @@ function App() {
       case true:
         return (
           <div>
-            <img src={img["btn_account.png"]} />
-            <span id="userName">vongquaynhanpham</span>
+            <img src={img["btn_account.png"]} style={{ position: "relative", top: "-5px" }} onClick={() => handleOnModal(LOGIN)} className='btn-pointer' alt='btn_account' />
+            <span id="userName">{userName}</span>
           </div>
         )
       default:
         return (
           <div>
-            <img src={img["btn_login.png"]} style={{ width: "195px" }} className='btn-pointer' onClick={() => handleOnModal(LOGIN)} />
+            <img src={img["btn_login.png"]} style={{ width: "195px" }} className='btn-pointer' onClick={() => handleOnModal(LOGIN)} alt='btn_login' />
           </div>
         )
     }
@@ -86,18 +95,20 @@ function App() {
       <FormAlert
         indexModal={indexModal}
         handleOffModal={handleOffModal}
+        setIndexLogin={setIndexLogin}
+        indexLogin={indexLogin}
         prize={prize}
         rewards={rewards}
       />
       <Row justify="center" className="btn-header">
-        <Col xl={{ span: 7 }} lg={{ span: 9 }} md={{ span: 11 }} xs={{span:11.5}}>
+        <Col xl={{ span: 7 }} lg={{ span: 9 }} md={{ span: 11 }} xs={{ span: 11.5 }} className={isLogin ? 'isLogin' : ""}>
           {printIsLogin()}
           <div className='number-row-mobile'>
             <img src={img["btn_number_row.png"]} />
             <span>0 lượt</span>
           </div>
         </Col>
-        <Col xl={{ span: 7 }} lg={{ span: 9 }} md={{ span: 11 }} xs={{span:11.5}}>
+        <Col xl={{ span: 7 }} lg={{ span: 9 }} md={{ span: 11 }} xs={{ span: 11.5 }}>
           <div className='number-row-desktop'>
             <img src={img["btn_number_row.png"]} />
             <span>0 lượt</span>
@@ -117,6 +128,14 @@ function App() {
         />
         <img src={img["model.png"]} className="model" />
       </div>
+      <Row justify='center' className='btn-setNumRow' type='flex'>
+        <Col sm={{ span: 1.5 }}>
+          <img src={img["btn_quay1lan.png"]} className={`btn-pointer ${disableButton}`} />
+        </Col>
+        <Col sm={{ span: 1.5 }}>
+          <img src={img["btn_quay10lan.png"]} className={`btn-pointer ${disableButton}`} />
+        </Col>
+      </Row>
       <Row justify="center" className="btn-homepage">
         <Col sm={{ span: 3 }} xs={{ span: 10 }} style={{ marginRight: '10rem' }}>
           <img src={img["btn_homepage.png"]} className='btn-pointer' />
