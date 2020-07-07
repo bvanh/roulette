@@ -3,6 +3,7 @@ import { Modal, Form, Input, Button, Checkbox, Alert } from "antd";
 import "../static/style/modal.scss";
 import typeModal from "../utils/tyleModal";
 import { imgRewards, img } from "../utils/importImg";
+import { login, getInfoCharacter } from '../utils/login'
 const { RULE, HISTORY, LOGIN, ALERT_REWARD } = typeModal;
 const layout = {
     labelCol: { span: 4 },
@@ -12,6 +13,8 @@ const FormAlert = (props) => {
     const { visible, isModal } = props.indexModal;
     const { prize, rewards, indexLogin } = props;
     const onFinish = (values) => {
+        // const { username, password } = values;
+        login(values)
         props.setIndexLogin({ isLogin: true, userName: values.username });
         props.handleOffModal();
         // console.log("Success:", values);

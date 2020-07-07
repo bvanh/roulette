@@ -4,7 +4,8 @@ import { Row, Col } from "antd";
 import { img } from "./utils/importImg";
 import FormAlert from "./components/modal";
 import typeModal from './utils/tyleModal';
-import { login,getInfoCharacter } from './utils/login'
+import { login, getInfoCharacter } from './utils/login';
+import { checkAccessToken } from './utils/checkToken'
 import "./App.scss";
 let roulette_img_on_highlight = img["wheel.png"];
 let roulette_img_under_highlight = img["wheel.png"];
@@ -45,7 +46,8 @@ function App() {
     setRewards(rewards_arr);
     // login({ 'username': userName, "password": password });
     getInfoCharacter();
-    
+    // checkAccessToken();
+
   }, [])
   const roulette_props = {
     roulette_img_under_highlight,

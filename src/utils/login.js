@@ -20,7 +20,7 @@ const login = (params) => {
             console.log(error.response);
         });
 };
-const getInfoCharacter = (accessToken) => {
+const getInfoCharacter = () => {
     baseGetInfoCharacter.get(api.GET_CHARACTER)
         .then(response => {
             console.log(response)
