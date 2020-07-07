@@ -9,6 +9,9 @@ function importAll(r) {
 const img = importAll(
   require.context("../static/image", false, /\.(png|jpe?g|svg)$/)
 );
+const imgRewards = importAll(
+  require.context("../static/image/rewards", false, /\.(png|jpe?g|svg)$/)
+);
 // const imgHome = importAll(
 //   require.context("../static/img/home", false, /\.(png|jpe?g|svg)$/)
 // );
@@ -22,4 +25,4 @@ const img = importAll(
 //     /\.(png|jpe?g|svg)$/
 //   )
 // );
-export { img};
+export { img, imgRewards };

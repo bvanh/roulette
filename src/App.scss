@@ -1,6 +1,12 @@
 @import "~antd/dist/antd.css";
 @import url("https://fonts.googleapis.com/css2?family=Anton&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Roboto&display=swap");
+$mobile-width: 767px;
+@mixin mobile {
+  @media (max-width: #{$mobile-width}) {
+    @content;
+  }
+}
 p,
 label {
   font-family: "Roboto", sans-serif;
@@ -11,14 +17,41 @@ label {
   background-position: top;
   background-repeat: no-repeat;
   font-family: "Anton", sans-serif;
+  overflow: hidden;
+  @include mobile() {
+    background-position: center;
+    background-size: cover;
+  }
   .btn-header {
     padding-top: 2rem;
     z-index: 2;
     position: relative;
+    .isLogin{
+      @include mobile(){
+        top: -12px;
+      }
+    }
     div {
       display: flex;
       align-items: flex-start;
       position: relative;
+      flex-direction: column;
+      .number-row-mobile {
+        display: none;
+      }
+      @include mobile() {
+        .number-row-mobile {
+          display: block;
+          img {
+            position: relative;
+            left: -5px;
+            top: 1px;
+          }
+        }
+        .number-row-desktop {
+          display: none;
+        }
+      }
       img {
         width: 155px;
       }
@@ -32,12 +65,18 @@ label {
         position: absolute;
         color: #f3e88c;
         left: 10%;
-        top: 48%;
+        top: 40%;
       }
     }
     div:last-child {
       align-items: flex-end;
       flex-direction: column;
+      @include mobile() {
+        #history-roulette {
+          position: relative;
+          top: -5px;
+        }
+      }
     }
   }
   .game-box {
@@ -45,12 +84,21 @@ label {
     width: 500px;
     z-index: 1;
     margin: 0 auto;
+    @include mobile() {
+      width: 300px;
+      margin-top: 3rem;
+    }
     .wheel-background {
       position: absolute;
       top: -118px;
       width: 147%;
       z-index: -1;
       left: -118px;
+      @include mobile() {
+        top: -70px;
+        width: 147%;
+        left: -70px;
+      }
     }
     .wheel-border {
       position: absolute;
@@ -58,6 +106,11 @@ label {
       width: 147%;
       z-index: 1;
       left: -118px;
+      @include mobile() {
+        top: -70px;
+        width: 147%;
+        left: -70px;
+      }
     }
     .wheel-button {
       position: absolute;
@@ -66,12 +119,21 @@ label {
       z-index: 2;
       pointer-events: all;
       width: 155px;
+      @include mobile() {
+        top: 35%;
+        width: 90px;
+        left: 35%;
+      }
     }
     .disable-spin {
       pointer-events: none;
     }
     // effect
     .wheel-button:active {
+      -ms-transform: scale(0.95);
+      -moz-transform: scale(0.95);
+      -webkit-transform: scale(0.95, 0.95);
+      -o-transform: scale(0.95);
       transform: scale(0.95);
     }
     .model {
@@ -79,17 +141,43 @@ label {
       top: -112px;
       left: -400px;
       z-index: 2;
+      @include mobile() {
+        display: none;
+      }
+    }
+  }
+  .btn-setNumRow {
+    div {
+      padding: 0 0.5rem;
+      @include mobile() {
+        max-width: 25%;
+      }
+      img {
+        width: 100%;
+        position: relative;
+        bottom: -50px;
+        z-index: 3;
+      }
     }
   }
   .btn-homepage {
-    padding: 10.5rem 0 5rem 0;
+    padding: 9.5rem 0 5rem 0;
     display: flex;
-    // justify-content: space-around;
+    @include mobile() {
+      padding: 7.5rem 0 5rem 0;
+    }
     div {
+      @include mobile() {
+        margin: 0 !important;
+      }
       img {
         width: 100%;
         position: relative;
         top: -50px;
+        @include mobile() {
+          padding: 1rem;
+          position: static;
+        }
       }
     }
   }
@@ -98,5 +186,8 @@ label {
   }
   .btn-pointer {
     cursor: pointer;
+  }
+  .disable-spin {
+    pointer-events: none;
   }
 }
