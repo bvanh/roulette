@@ -1,37 +1,79 @@
-import React from "react";
-import { Modal, Form, Input, Button, Checkbox, Alert } from "antd";
+import React, { useState, useMemo, useEffect } from "react";
+import { Modal, Form, Input, Button, Radio, Row, Col } from "antd";
 import "../static/style/modal.scss";
 import typeModal from "../utils/tyleModal";
 import { imgRewards, img } from "../utils/importImg";
-import { login, getInfoCharacter } from '../utils/login'
-const { RULE, HISTORY, LOGIN, ALERT_REWARD } = typeModal;
+import { login } from "../utils/login";
+import { getInfoCharacter, getInfoSpin } from "../utils/getInfo";
+import { checkAccessToken } from "../utils/checkToken";
+const { RULE, HISTORY, LOGIN, ALERT_REWARD, PICK_SERVER } = typeModal;
 const layout = {
     labelCol: { span: 4 },
     wrapperCol: { span: 16 },
 };
 const FormAlert = (props) => {
     const { visible, isModal } = props.indexModal;
-    const { prize, rewards, indexLogin } = props;
-    const onFinish = (values) => {
-        // const { username, password } = values;
-        login(values)
-        props.setIndexLogin({ isLogin: true, userName: values.username });
-        props.handleOffModal();
-        // console.log("Success:", values);
+    const { prize, rewards, indexLogin, indexSpin } = props;
+    const [userInfo, setUserInfo] = useState([
+        {
+            serverId: "",
+            serverName: "",
+            userId: "",
+            screenName: "",
+        },
+    ]);
+    const [messageError, setMessageError] = useState("");
+    useEffect(() => {
+        if (checkAccessToken()) {
+            getInfoCharacter().then((response) => {
+                setUserInfo(response);
+            });
+        }
+    }, []);
+    const onFinish = async (values) => {
+        login(values).then((value) => {
+            if (value.status === 200) {
+                getInfoCharacter().then((response) => {
+                    console.log(response);
+                    setUserInfo(response);
+                });
+                props.setIndexLogin({ isLogin: true, userName: values.username });
+                props.handleOnModal(PICK_SERVER);
+            } else {
+                setMessageError(value.data.message);
+            }
+        });
     };
-
-    const onFinishFailed = (errorInfo) => {
-        console.log("Failed:", errorInfo);
+    const onFieldsChange = () => {
+        setMessageError("");
+    };
+    const onChangeServer = (value) => {
+        const convertValue = JSON.parse(value);
+        const { gameUserId, serverId, serverName } = convertValue;
+        const params = {
+            gameUserId: gameUserId,
+            serverId: serverId,
+        };
+        getInfoSpin(params).then((dataSpin) => {
+            const { screenName, currentTimes } = dataSpin;
+            props.setSpin({
+                ...indexSpin,
+                currentTimesSpin: currentTimes,
+                serverName: serverName,
+                gameUserName: screenName,
+                gameUserId: gameUserId,
+                serverId: serverId
+            });
+        });
     };
     const printModal = () => {
         switch (isModal) {
             case ALERT_REWARD:
                 return (
-                    <div className='alert-rewards'>
-                        <img src={imgRewards[`${prize}.png`]} />
-                        <h2>{rewards[prize]}</h2>
+                    <div className="alert-rewards">
+                       {printRewards(prize)}
                     </div>
-                )
+                );
             case RULE:
                 return (
                     <>
@@ -65,26 +107,20 @@ const FormAlert = (props) => {
                             {...layout}
                             name="basic"
                             onFinish={onFinish}
-                            onFinishFailed={onFinishFailed}
+                            onFieldsChange={onFieldsChange}
                         >
-                            <Form.Item
-                                label="Tên đăng nhập"
-                                name="username"
-                                rules={[
-                                    { required: true, message: "Kiểm tra lại tên đăng nhập !" },
-                                ]}
-                            >
+                            <Form.Item label="Tên đăng nhập" name="username">
                                 <Input />
                             </Form.Item>
-                            <Form.Item
-                                label="Mật khẩu"
-                                name="password"
-                                rules={[
-                                    { required: true, message: "Kiểm tra lại mật khẩu!" },
-                                ]}
-                            >
+                            <Form.Item label="Mật khẩu" name="password">
                                 <Input.Password />
                             </Form.Item>
+                            <Row type="flex" justify="space-around">
+                                <Col span={4}></Col>
+                                <Col span={16}>
+                                    <p className="alert-login">{messageError}</p>
+                                </Col>
+                            </Row>
                             <Form.Item style={{ display: "none" }}>
                                 <Button type="primary" htmlType="submit">
                                     Submit
@@ -93,10 +129,27 @@ const FormAlert = (props) => {
                         </Form>
                     </>
                 );
+            case PICK_SERVER:
+                return <>{printServer}</>;
             default:
                 break;
         }
     };
+    const printRewards = (arrRewards) => {
+       return arrRewards.map((val, index) => (
+            <Row key={index} type='flex' align="middle" justify="space-between">
+                <img src={imgRewards[`${val}.png`]} width="45px" />
+                <h2>{rewards[val]}</h2>
+            </Row>
+        ))
+    }
+    const printServer = userInfo.map((val, index) => (
+        <Radio.Group onChange={(e) => onChangeServer(e.target.value)} key={index}>
+            <Radio
+                value={`{"gameUserId":"${val.userId}","serverId":"${val.serverId}","serverName":"${val.serverName}"}`}
+            >{`${val.serverName}-${val.screenName}`}</Radio>
+        </Radio.Group>
+    ));
     return (
         <div>
             <Modal

@@ -1,13 +1,12 @@
 import { api, baseLogin, baseGetInfoCharacter } from "../api/api";
 import qs from "qs";
 const login = (params) => {
-    baseLogin
+   return baseLogin
         .post(api.AUTH_LOGIN, qs.stringify(params))
         .then((response) => {
-            console.log(response);
-            let userToken = { token: response, timestamp: new Date().getTime() };
+            let userToken = { token: { ...response.data, ...params }, timestamp: new Date().getTime() };
             let userAccessToken = {
-                accessToken: response.accessToken,
+                accessToken: response.data.accessToken,
                 timestamp: new Date().getTime(),
             };
             localStorage.setItem("tokenRoulette", JSON.stringify(userToken));
@@ -15,18 +14,10 @@ const login = (params) => {
                 "accessTokenRoulette",
                 JSON.stringify(userAccessToken)
             );
+            return response;
         })
         .catch((error) => {
-            console.log(error.response);
+            return error.response;
         });
 };
-const getInfoCharacter = () => {
-    baseGetInfoCharacter.get(api.GET_CHARACTER)
-        .then(response => {
-            console.log(response)
-        })
-        .catch(e => {
-            console.log(e.response)
-        })
-}
-export { login, getInfoCharacter };
+export { login };

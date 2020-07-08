@@ -8,8 +8,11 @@ const api = {
     ROOT: "https://test.api.spin.3qz.clappigames.com",
     AUTH_LOGIN: "/auth/login",
     GET_CHARACTER: "/private/characters",
+    GET_INFO_SPIN: "/private/info",
+    GET_RESULT_SPIN: "/private/spin",
     REFRESH_TOKEN: "/auth/renew/access"
 }
+// refreshToken
 const refreshToken = axios.create({
     baseURL: api.ROOT
 })
@@ -19,58 +22,60 @@ const baseLogin = axios.create({
         "Content-Type": "application/x-www-form-urlencoded",
     },
 })
+// login
 baseLogin.interceptors.response.use((response) => {
     if (response && response.data) {
-        return response.data;
+        return response;
     }
     return response;
 }, error => {
     console.log(error.response)
     throw error;
 })
+// getInforCharacter
 const baseGetInfoCharacter = axios.create({
     baseURL: api.ROOT,
 })
-baseGetInfoCharacter.interceptors.request.use(config => {
-    const token = localStorage.getItem('accessTokenRoulette');
-    if (token) {
-        config.headers['Authorization'] = 'Bearer ' + JSON.parse(token).accessToken;
+baseGetInfoCharacter.interceptors.request.use(async (config) => {
+    const isValidToken = await checkAccessToken();
+    const token = localStorageService.getAccessToken();
+    if (token && isValidToken) {
+        config.headers['Authorization'] = 'Bearer ' + token;
         return config;
     }
 }, error => {
-    Promise.reject(error)
+    throw error;
 })
 baseGetInfoCharacter.interceptors.response.use(response => {
-    return response;
+    return response.data;
 }, function (error) {
-    const originalRequest = error.config;
-
-    //     if (error.response.status === 401 && originalRequest.url === 
-    //  'http://13.232.130.60:8081/v1/auth/token) {
-    //         router.push('/login');
-    //         return Promise.reject(error);
-    //     }
-
-    if (error.response.status === 401 && !originalRequest._retry) {
-        originalRequest._retry = true;
-        const tokenRoulette = JSON.parse(localStorage.getItem("tokenRoulette"));
-        return refreshToken.post(api.REFRESH_TOKEN, {
-            "refreshToken": tokenRoulette.token.refreshToken
-        })
-            .then(response => {
-                console.log(response.data)
-                let userAccessToken = {
-                    accessToken: response.data.accessToken,
-                    timestamp: new Date().getTime(),
-                };
-                localStorage.setItem(
-                    "accessTokenRoulette",
-                    JSON.stringify(userAccessToken)
-                );
-                axios.defaults.headers.common['Authorization'] = 'Bearer ' + localStorageService.getAccessToken();
-                return axios(originalRequest);
-            })
+    console.log(error)
+    const originalRequest = error.response.config;
+    if (error.response.status !== 401) {
+        // console.log(error)
+        return Promise.reject(error);
     }
-    return Promise.reject(error);
+    const tokenRoulette = JSON.parse(localStorage.getItem("tokenRoulette"));
+    return refreshToken.post(api.REFRESH_TOKEN, {
+        "refreshToken": tokenRoulette.token.refreshToken
+    })
+        .then(response => {
+            console.log(response)
+            let userAccessToken = {
+                accessToken: response.data.accessToken,
+                timestamp: new Date().getTime(),
+            };
+            localStorage.setItem(
+                "accessTokenRoulette",
+                JSON.stringify(userAccessToken)
+            );
+            originalRequest.headers['Authorization'] = 'Bearer ' + response.data.accessToken;
+            return axios(originalRequest);
+        }).catch(error => {
+            /*destroyToken();*/
+            console.log(error)
+            return Promise.reject(error);
+        })
+
 })
 export { api, baseLogin, baseGetInfoCharacter, refreshToken }
