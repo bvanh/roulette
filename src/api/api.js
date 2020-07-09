@@ -27,16 +27,15 @@ baseLogin.interceptors.response.use((response) => {
     return response;
 }, error => {
     console.log(error.response)
-    Promise.reject(error)
+    throw error;
 })
 // getInforCharacter
 const baseGetInfoCharacter = axios.create({
     baseURL: api.ROOT,
 })
-baseGetInfoCharacter.interceptors.request.use(async (config) => {
-    const isValidToken = await checkAccessToken();
+baseGetInfoCharacter.interceptors.request.use((config) => {
     const token = localStorageService.getAccessToken();
-    if (token && isValidToken) {
+    if (token) {
         config.headers['Authorization'] = 'Bearer ' + token;
         return config;
     }
@@ -44,7 +43,7 @@ baseGetInfoCharacter.interceptors.request.use(async (config) => {
     Promise.reject(error)
 })
 baseGetInfoCharacter.interceptors.response.use(response => {
-    return response.data;
+    return response;
 }, function (error) {
     const originalRequest = error.response.config;
     console.log(error.response)

@@ -28,6 +28,11 @@ label {
     position: relative;
     .isLogin{
       @include mobile(){
+        top: -8px;
+      }
+    }
+    .isSpin {
+      @include mobile(){
         top: -12px;
       }
     }
@@ -60,6 +65,11 @@ label {
         color: #f3e88c;
         left: 45%;
         top: 42%;
+      }
+      .anticon{
+        top: 24px;
+        right: 7px;
+        left: inherit;
       }
       #userName {
         position: absolute;
@@ -183,9 +193,6 @@ label {
   }
   .start-btn {
     display: none;
-  }
-  .btn-pointer {
-    cursor: pointer;
   }
   .disable-spin {
     pointer-events: none;

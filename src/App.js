@@ -5,12 +5,22 @@ import { img } from "./utils/importImg";
 import FormAlert from "./components/modal";
 import typeModal from "./utils/tyleModal";
 import localStorageService from "./utils/localStorageService";
-import { getResultSpin } from './utils/getInfo'
-import { checkInfoSpin } from './utils/checkInfo'
+import { getResultSpin } from "./utils/getInfo";
+import { checkInfoSpin, listError } from "./utils/checkInfo";
+import { SwapOutlined, LogoutOutlined } from "@ant-design/icons";
 import "./App.scss";
+import { checkAccessToken } from "./utils/checkToken";
 let roulette_img_on_highlight = img["wheel.png"];
 let roulette_img_under_highlight = img["wheel.png"];
-const { RULE, HISTORY, LOGIN, ALERT_REWARD, PICK_SERVER } = typeModal;
+const {
+  RULE,
+  HISTORY,
+  LOGIN,
+  ALERT_REWARD,
+  PICK_SERVER,
+  MESSEAGE,
+  LOGOUT,
+} = typeModal;
 const rewards_arr = [
   "Mảnh Valkyrie*5",
   "Mảnh Caroline*3",
@@ -30,6 +40,7 @@ function App() {
   const [indexModal, setIndexModal] = useState({
     isModal: LOGIN,
     visible: false,
+    message: "",
   });
   const [prize, setPrize] = useState([]);
   const [indexLogin, setIndexLogin] = useState({
@@ -44,16 +55,18 @@ function App() {
     gameUserName: null,
     serverId: 0,
     gameUserId: 0,
-  })
+  });
   const [reset, setReset] = useState(false);
-  const [rewards, setRewards] = useState([]);
   const { isSpin, disableButton } = mustSpin;
   const { gameUserName, serverName, currentTimesSpin, timesSpin } = indexSpin;
   const { isLogin, userName, password } = indexLogin;
   let set_prize = prize[0];
   let start = isSpin;
   useEffect(() => {
-    setRewards(rewards_arr);
+    if (checkAccessToken()) {
+      localStorageService.resetToken();
+      setIndexLogin({ ...indexLogin, isLogin: false });
+    }
   }, []);
   const roulette_props = {
     roulette_img_under_highlight,
@@ -63,10 +76,15 @@ function App() {
     set_prize,
     reset,
     on_complete: (prize) => alertPrize(prize),
-    prize_arr: rewards,
+    prize_arr: rewards_arr,
   };
-  const handleOnModal = (isModal) => {
-    setIndexModal({ ...indexModal, visible: true, isModal: isModal });
+  const handleOnModal = (isModal, message) => {
+    setIndexModal({
+      ...indexModal,
+      visible: true,
+      isModal: isModal,
+      message: message,
+    });
   };
   const handleOffModal = () => {
     setIndexModal({ ...indexModal, visible: false });
@@ -75,24 +93,39 @@ function App() {
     await setMustSpin({ ...mustSpin, isSpin: false });
     setTimeout(setReset(true), 2000);
     handleOnModal(ALERT_REWARD);
-    setIndexSpin({ ...indexSpin, timesSpin: 1 })
+    setIndexSpin({ ...indexSpin, timesSpin: 1 });
   };
   const startSpin = async () => {
-    const { timesSpin, gameUserId, serverId } = indexSpin
-    const isValidSpin = checkInfoSpin(gameUserId, serverId);
+    const { timesSpin, gameUserId, serverId } = indexSpin;
+    const isValidSpin = checkInfoSpin(
+      isLogin,
+      gameUserId,
+      serverId,
+      timesSpin,
+      currentTimesSpin
+    );
+    const { GAMEUSER_ERROR, TIMESPIN_ERROR, ACCOUNT_ERROR } = listError;
     switch (isValidSpin) {
-      case false:
-        handleOnModal('THÔNG BÁO')
+      case ACCOUNT_ERROR:
+        handleOnModal(MESSEAGE, ACCOUNT_ERROR);
+        break;
+      case GAMEUSER_ERROR:
+        handleOnModal(MESSEAGE, GAMEUSER_ERROR);
+        break;
+      case TIMESPIN_ERROR:
+        handleOnModal(MESSEAGE, TIMESPIN_ERROR);
         break;
       default:
         const params = {
           gameUserId: gameUserId,
           spinTimes: timesSpin,
-          serverId: serverId
-        }
-        await getResultSpin(params).then(result => {
-          setPrize(result.results)
-        })
+          serverId: serverId,
+        };
+        await getResultSpin(params).then((result) => {
+          const { currentTimes, results } = result.data;
+          setPrize(results);
+          setIndexSpin({ ...indexSpin, currentTimesSpin: currentTimes });
+        });
         setMustSpin({ ...mustSpin, isSpin: true });
         setReset(false);
         setMustSpin({ ...mustSpin, disableButton: "disable-spin" });
@@ -100,31 +133,32 @@ function App() {
     }
   };
   const setTimesSpin = (value) => {
-    setIndexSpin({ ...indexSpin, timesSpin: value })
-  }
+    setIndexSpin({ ...indexSpin, timesSpin: value });
+  };
   const printIsLogin = () => {
     switch (isLogin) {
       case true:
         return (
           <div>
-            <div>
+            <div onClick={() => handleOnModal(LOGOUT)} className="btn-pointer">
               <img
                 src={img["btn_account.png"]}
                 style={{ position: "relative", top: "-5px" }}
-                onClick={() => handleOnModal(LOGIN)}
-                className="btn-pointer"
                 alt="btn_account"
               />
+              <LogoutOutlined />
               <span id="userName">{userName}</span>
             </div>
-            <div>
+            <div
+              onClick={() => handleOnModal(PICK_SERVER)}
+              className="btn-pointer"
+            >
               <img
                 src={img["btn_gameUser.png"]}
                 style={{ position: "relative", top: "-5px" }}
-                onClick={() => handleOnModal(PICK_SERVER)}
-                className="btn-pointer"
                 alt="btn_account"
               />
+              <SwapOutlined />
               <span id="userName">{gameUserName}</span>
             </div>
           </div>
@@ -149,7 +183,7 @@ function App() {
         indexModal={indexModal}
         indexLogin={indexLogin}
         prize={prize}
-        rewards={rewards}
+        rewards={rewards_arr}
         indexSpin={indexSpin}
         handleOffModal={handleOffModal}
         handleOnModal={handleOnModal}
@@ -161,22 +195,23 @@ function App() {
           xl={{ span: 7 }}
           lg={{ span: 9 }}
           md={{ span: 11 }}
-          xs={{ span: 11.5 }}
+          xs={{ span: 11.8 }}
           className={isLogin ? "isLogin" : ""}
         >
           {printIsLogin()}
-          <div className="number-row-mobile">
+          {/* <div className="number-row-mobile">
             <img src={img["btn_number_row.png"]} />
             <span>{currentTimesSpin} lượt</span>
-          </div>
+          </div> */}
         </Col>
         <Col
           xl={{ span: 7 }}
           lg={{ span: 9 }}
           md={{ span: 11 }}
-          xs={{ span: 11.5 }}
+          xs={{ span: 11 }}
+          className='isSpin'
         >
-          <div className="number-row-desktop">
+          <div>
             <img src={img["btn_number_row.png"]} />
             <span>{currentTimesSpin} lượt</span>
           </div>
@@ -208,14 +243,18 @@ function App() {
         <Col sm={{ span: 1.5 }}>
           <img
             src={img["btn_quay1lan.png"]}
-            className={`btn-pointer ${disableButton} ${timesSpin === 1 ? "isPickedTimesSpin" : ""}`}
+            className={`btn-pointer ${disableButton} ${
+              timesSpin === 1 ? "" : "isPickedTimesSpin"
+            }`}
             onClick={() => setTimesSpin(1)}
           />
         </Col>
         <Col sm={{ span: 1.5 }}>
           <img
             src={img["btn_quay10lan.png"]}
-            className={`btn-pointer ${disableButton} ${timesSpin === 10 ? "isPickedTimesSpin" : ""}`}
+            className={`btn-pointer ${disableButton} ${
+              timesSpin === 10 ? "" : "isPickedTimesSpin"
+            }`}
             onClick={() => setTimesSpin(10)}
           />
         </Col>
@@ -226,10 +265,14 @@ function App() {
           xs={{ span: 10 }}
           style={{ marginRight: "10rem" }}
         >
-          <img src={img["btn_homepage.png"]} className="btn-pointer" />
+          <a href="https://3qphancong.lussom.vn/" target="_blank">
+            <img src={img["btn_homepage.png"]} className="btn-pointer" />
+          </a>
         </Col>
         <Col sm={{ span: 3 }} xs={{ span: 10 }} style={{ marginLeft: "10rem" }}>
-          <img src={img["btn_fanpage.png"]} className="btn-pointer" />
+          <a href="https://www.facebook.com/3QZVN/" target="_blank">
+            <img src={img["btn_fanpage.png"]} className="btn-pointer" />
+          </a>
         </Col>
       </Row>
     </div>

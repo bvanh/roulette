@@ -1,11 +1,4 @@
 import { api, baseLogin, refreshToken } from "../api/api";
-import { Modal } from 'antd';
-function errorAlert() {
-    Modal.error({
-        title: 'Có một số lỗi xảy ra !',
-        content: 'Đăng nhập lại',
-    });
-}
 
 function checkAccessToken() {
     const currentTime = new Date().getTime();
@@ -19,10 +12,9 @@ function checkAccessToken() {
         tokenRoulette === null ||
         checkExpriedToken
     ) {
-        errorAlert();
-        return false;
-    } else {
         return true;
+    } else {
+        return false;
     }
 }
 const getRefreshToken = () => {
@@ -46,10 +38,5 @@ const getRefreshToken = () => {
             console.log(error);
         });
 };
-// function checkToken() {
-//     if (checkAccessToken()) {
-//         let demo = getRefreshToken();
-//         // demo.then(val => dispatchSetAccessToken(val));
-//     }
-// }
+
 export { checkAccessToken, getRefreshToken };

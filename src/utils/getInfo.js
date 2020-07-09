@@ -13,8 +13,7 @@ const getInfoSpin = (params) => {
     return baseGetInfoCharacter
         .post(api.GET_INFO_SPIN, params)
         .then(response => {
-            console.log(response)
-            return response;
+            return response.data;
         })
         .catch(e => {
             console.log(e.response)

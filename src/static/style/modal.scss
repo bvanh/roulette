@@ -41,7 +41,13 @@ $mobile-width: 767px;
         @include mobile() {
           top: -38px;
           img {
-            width: 75%;
+            width: 45%;
+          }
+          .CHON_SERVER,.TÀI{
+            width: 70%;
+          }
+          .message{
+            width: 23%;
           }
         }
       }
@@ -64,6 +70,22 @@ $mobile-width: 767px;
           font-size: 1rem;
         }
       }
+      .alert-error {
+        h2{
+          color: #f3e88c;
+          @include mobile(){
+            font-size: 1rem;
+          }
+        }
+        text-align: center;
+      }
+      .alert-logout{
+        @include mobile(){
+          img{
+            padding: .5rem;
+          }
+        }
+      }
     }
     .ant-modal-close {
       position: absolute;
@@ -81,13 +103,15 @@ $mobile-width: 767px;
     }
   }
   .alert-login {
-    height: 8px;
+    height: 10px;
     margin: 0;
     color: #ef4f4f;
-
     position: relative;
-    top: -5px;
+    top: -17px;
   }
+  // .alert-logout{
+  //   di
+  // }
   .ant-radio-checked .ant-radio-inner {
     border-color: #cdb150;
   }
@@ -95,10 +119,18 @@ $mobile-width: 767px;
   .ant-radio-inner::after {
     background-color: #cdb150;
   }
+  .ant-radio-wrapper{
+    font-size: 1rem;
+  }
   .ant-radio-wrapper-checked span input:focus {
     background: #cdb150;
   }
   .ant-radio-input:focus + .ant-radio-inner {
     border-color: #cdb150;
+  }
+  .submit{
+    div label{
+      visibility: hidden;
+    }
   }
 }
