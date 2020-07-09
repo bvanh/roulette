@@ -46,7 +46,7 @@ const FormAlert = (props) => {
   const onFinish = async (values) => {
     login(values).then((value) => {
       console.log(value);
-      if (value.status === 200) {
+      if (value?.status === 200) {
         resetData();
         getInfoCharacter().then((response) => {
           console.log(response);
@@ -55,7 +55,7 @@ const FormAlert = (props) => {
         props.setIndexLogin({ isLogin: true, userName: values.username });
         props.handleOnModal(PICK_SERVER);
       } else {
-        setMessageError(value.data.message);
+        setMessageError(value?.data.message);
       }
     });
   };
