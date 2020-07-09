@@ -3,10 +3,10 @@ import qs from "qs";
 const getInfoCharacter = () => {
     return baseGetInfoCharacter.get(api.GET_CHARACTER)
         .then(response => {
-            return response;
+           return response;
         })
         .catch(e => {
-            return e.response;
+             console.log(e.response);
         })
 }
 const getInfoSpin = (params) => {

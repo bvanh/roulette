@@ -1,7 +1,4 @@
 import axios from 'axios';
-import qs from 'qs'
-import querystring from "querystring"
-import { access } from 'fs';
 import { checkAccessToken, getRefreshToken } from '../utils/checkToken';
 import localStorageService from '../utils/localStorageService'
 const api = {
@@ -30,7 +27,7 @@ baseLogin.interceptors.response.use((response) => {
     return response;
 }, error => {
     console.log(error.response)
-    throw error;
+    Promise.reject(error)
 })
 // getInforCharacter
 const baseGetInfoCharacter = axios.create({
@@ -44,13 +41,13 @@ baseGetInfoCharacter.interceptors.request.use(async (config) => {
         return config;
     }
 }, error => {
-    throw error;
+    Promise.reject(error)
 })
 baseGetInfoCharacter.interceptors.response.use(response => {
     return response.data;
 }, function (error) {
-    console.log(error)
     const originalRequest = error.response.config;
+    console.log(error.response)
     if (error.response.status !== 401) {
         // console.log(error)
         return Promise.reject(error);

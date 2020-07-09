@@ -6,6 +6,7 @@ import FormAlert from "./components/modal";
 import typeModal from "./utils/tyleModal";
 import localStorageService from "./utils/localStorageService";
 import { getResultSpin } from './utils/getInfo'
+import { checkInfoSpin } from './utils/checkInfo'
 import "./App.scss";
 let roulette_img_on_highlight = img["wheel.png"];
 let roulette_img_under_highlight = img["wheel.png"];
@@ -34,7 +35,7 @@ function App() {
   const [indexLogin, setIndexLogin] = useState({
     isLogin: localStorageService.getToken() ? true : false,
     userName: localStorageService.getToken()?.username,
-    password: "12345678",
+    password: "",
   });
   const [indexSpin, setIndexSpin] = useState({
     currentTimesSpin: 0,
@@ -47,7 +48,7 @@ function App() {
   const [reset, setReset] = useState(false);
   const [rewards, setRewards] = useState([]);
   const { isSpin, disableButton } = mustSpin;
-  const { gameUserName, serverName, currentTimesSpin } = indexSpin;
+  const { gameUserName, serverName, currentTimesSpin, timesSpin } = indexSpin;
   const { isLogin, userName, password } = indexLogin;
   let set_prize = prize[0];
   let start = isSpin;
@@ -74,21 +75,29 @@ function App() {
     await setMustSpin({ ...mustSpin, isSpin: false });
     setTimeout(setReset(true), 2000);
     handleOnModal(ALERT_REWARD);
+    setIndexSpin({ ...indexSpin, timesSpin: 1 })
   };
   const startSpin = async () => {
     const { timesSpin, gameUserId, serverId } = indexSpin
-    const params = {
-      gameUserId: gameUserId,
-      spinTimes: timesSpin,
-      serverId: serverId
+    const isValidSpin = checkInfoSpin(gameUserId, serverId);
+    switch (isValidSpin) {
+      case false:
+        handleOnModal('THÔNG BÁO')
+        break;
+      default:
+        const params = {
+          gameUserId: gameUserId,
+          spinTimes: timesSpin,
+          serverId: serverId
+        }
+        await getResultSpin(params).then(result => {
+          setPrize(result.results)
+        })
+        setMustSpin({ ...mustSpin, isSpin: true });
+        setReset(false);
+        setMustSpin({ ...mustSpin, disableButton: "disable-spin" });
+        break;
     }
-    await getResultSpin(params).then(result => {
-      console.log(result)
-      setPrize(result.results)
-    })
-    setMustSpin({ ...mustSpin, isSpin: true });
-    setReset(false);
-    setMustSpin({ ...mustSpin, disableButton: "disable-spin" });
   };
   const setTimesSpin = (value) => {
     setIndexSpin({ ...indexSpin, timesSpin: value })
@@ -199,15 +208,15 @@ function App() {
         <Col sm={{ span: 1.5 }}>
           <img
             src={img["btn_quay1lan.png"]}
-            className={`btn-pointer ${disableButton}`}
-            onClick={()=>setTimesSpin(1)}
+            className={`btn-pointer ${disableButton} ${timesSpin === 1 ? "isPickedTimesSpin" : ""}`}
+            onClick={() => setTimesSpin(1)}
           />
         </Col>
         <Col sm={{ span: 1.5 }}>
           <img
             src={img["btn_quay10lan.png"]}
-            className={`btn-pointer ${disableButton}`}
-            onClick={()=>setTimesSpin(10)}
+            className={`btn-pointer ${disableButton} ${timesSpin === 10 ? "isPickedTimesSpin" : ""}`}
+            onClick={() => setTimesSpin(10)}
           />
         </Col>
       </Row>
