@@ -5,7 +5,9 @@ import typeModal from "../utils/tyleModal";
 import { imgRewards, img } from "../utils/importImg";
 import { login } from "../utils/login";
 import { getInfoCharacter, getInfoSpin } from "../utils/getInfo";
-import { checkAccessToken } from "../utils/checkToken";
+import { api } from '../api/api'
+import { GoogleLogin } from "react-google-login";
+import FacebookLogin from "react-facebook-login/dist/facebook-login-render-props";
 import localStorageService from "../utils/localStorageService";
 const {
   RULE,
@@ -24,6 +26,9 @@ const layout = {
 const FormAlert = (props) => {
   const { visible, isModal, message } = props.indexModal;
   const { prize, rewards, indexLogin, indexSpin } = props;
+  const [typeLogin, setTypeLogin] = useState({
+    isTypeLogin: "",
+  });
   const [userInfo, setUserInfo] = useState([
     {
       serverId: "",
@@ -33,27 +38,30 @@ const FormAlert = (props) => {
     },
   ]);
   const [messageError, setMessageError] = useState("");
+  const { isTypeLogin } = typeLogin;
   useEffect(() => {
     switch (isModal) {
       case PICK_SERVER:
         getInfoCharacter().then((response) => {
           console.log(response);
-          setUserInfo(response.data);
+          if (response) {
+            setUserInfo(response.data);
+          }
         });
-        break;
+        return;
     }
   }, [isModal]);
   const onFinish = async (values) => {
-    login(values).then((value) => {
+    login(api.AUTH_LOGIN, values, values).then((value) => {
       console.log(value);
       if (value?.status === 200) {
         resetData();
-        getInfoCharacter().then((response) => {
+        getInfoCharacter().then(async (response) => {
           console.log(response);
-          setUserInfo(response.data);
+          await setUserInfo(response.data);
+          await props.setIndexLogin({ isLogin: true, userName: values.username });
+          props.handleOnModal(PICK_SERVER);
         });
-        props.setIndexLogin({ isLogin: true, userName: values.username });
-        props.handleOnModal(PICK_SERVER);
       } else {
         setMessageError(value?.data.message);
       }
@@ -78,27 +86,38 @@ const FormAlert = (props) => {
   const onFieldsChange = () => {
     setMessageError("");
   };
-  const onChangeServer = (value) => {
+  const onChangeServer = (value, index) => {
     const convertValue = JSON.parse(value);
-    const { gameUserId, serverId, serverName } = convertValue;
-    const params = {
-      gameUserId: gameUserId,
-      serverId: serverId,
-    };
-    getInfoSpin(params).then((dataSpin) => {
+    const { gameUserId, serverId, gameUserName, serverName } = convertValue;
+    getInfoSpin({ id: index }).then((dataSpin) => {
       console.log(dataSpin);
-      const { screenName, currentTimes } = dataSpin;
-      props.setSpin({
-        ...indexSpin,
-        currentTimesSpin: currentTimes,
-        serverName: serverName,
-        gameUserName: screenName,
-        gameUserId: gameUserId,
-        serverId: serverId,
-      });
+      if (dataSpin?.status === 200) {
+        const { currentTimes } = dataSpin.data;
+        props.setSpin({
+          ...indexSpin,
+          currentTimesSpin: currentTimes,
+          serverName: serverName,
+          gameUserName: gameUserName,
+          gameUserId: gameUserId,
+          serverId: serverId,
+        });
+      }
     });
   };
   const onFinishFailed = (val) => {
+    console.log(val);
+  };
+  const responseGoogle = (val) => {
+    if (val) {
+      const { tokenId, profileObj } = val;
+      login(api.AUTH_GG_LOGIN, { "accessToken": tokenId }, { "username": profileObj.email }).then(userToken => {
+        console.log(userToken)
+      })
+      props.setIndexLogin({ isLogin: true, userName: profileObj.email });
+    }
+    console.log(val);
+  };
+  const responseFacebook = (val) => {
     console.log(val);
   };
   const printModal = () => {
@@ -132,40 +151,7 @@ const FormAlert = (props) => {
           </>
         );
       case LOGIN:
-        return (
-          <>
-            <Form
-              {...layout}
-              name="basic"
-              onFinish={onFinish}
-              onFinishFailed={onFinishFailed}
-              onFieldsChange={onFieldsChange}
-            >
-              <Form.Item label="Tên đăng nhập" name="username" {...layout}>
-                <Input />
-              </Form.Item>
-              <Form.Item label="Mật khẩu" name="password" {...layout}>
-                <Input.Password />
-              </Form.Item>
-              <Row type="flex" justify="space-around">
-                <Col span={4}></Col>
-                <Col span={16}>
-                  <p className="alert-login">{messageError}</p>
-                </Col>
-              </Row>
-              <Form.Item label="submit" className="submit" {...layout}>
-                <Button type="link" htmlType="submit" style={{left:"-15px" }}>
-                  <img
-                  src={img["btn_login_enter.png"]}
-                  className="btn-pointer"
-                  style={{ width: "130px",left:"15px" }}
-                />
-                </Button>
-               
-              </Form.Item>
-            </Form>
-          </>
-        );
+        return <>{printTypeLogin()}</>;
       case PICK_SERVER:
         return <>{printServer}</>;
       case MESSEAGE:
@@ -176,7 +162,7 @@ const FormAlert = (props) => {
         );
       case LOGOUT:
         return (
-          <Row type="flex" justify="space-around" className='alert-logout'>
+          <Row type="flex" justify="space-around" className="alert-logout">
             <img
               src={img["btn_cancel.png"]}
               onClick={() => props.handleOffModal()}
@@ -202,14 +188,85 @@ const FormAlert = (props) => {
       </Row>
     ));
   };
+  const printTypeLogin = () => {
+    switch (isTypeLogin) {
+      case "":
+        return (
+          <Row type="flex" justify="space-around">
+            <img
+              src={img["btn_login_clappi.png"]}
+              className="btn-pointer btn_login"
+              onClick={() =>
+                setTypeLogin({ ...typeLogin, isTypeLogin: "CLAPPI" })
+              }
+            />
+            <GoogleLogin
+              clientId={"1082828967661-iqn44j6piegilfd75p2718o71tdabe4e.apps.googleusercontent.com"}
+              onSuccess={responseGoogle}
+              onFailure={responseGoogle}
+              className="btn_login_gg"
+              isSignedIn={false}
+            >
+              <img
+                src={img["btn_login_gg.png"]}
+                className="btn-pointer btn_login"
+              />
+            </GoogleLogin>
+            <FacebookLogin
+              appId="391762371762430"
+              callback={responseFacebook}
+              render={(renderProps) => (
+                <img
+                  src={img["btn_login_fb.png"]}
+                  className="btn-pointer btn_login"
+                  onClick={renderProps.onClick}
+                />
+              )}
+            />
+          </Row>
+        );
+      case "CLAPPI":
+        return (
+          <Form
+            {...layout}
+            name="basic"
+            onFinish={onFinish}
+            onFinishFailed={onFinishFailed}
+            onFieldsChange={onFieldsChange}
+          >
+            <Form.Item label="Tên đăng nhập" name="username">
+              <Input />
+            </Form.Item>
+            <Form.Item label="Mật khẩu" name="password">
+              <Input.Password />
+            </Form.Item>
+            <Row type="flex" justify="space-around">
+              <Col span={4}></Col>
+              <Col span={16}>
+                <p className="alert-login">{messageError}</p>
+              </Col>
+            </Row>
+            <Form.Item label="submit" className="submit">
+              <Button type="link" htmlType="submit" style={{ padding: "0" }}>
+                <img
+                  src={img["btn_login_enter.png"]}
+                  className="btn-pointer"
+                  style={{ width: "130px", left: "15px" }}
+                />
+              </Button>
+            </Form.Item>
+          </Form>
+        );
+    }
+  };
   const printServer = userInfo.map((val, index) => (
     <Radio.Group
-      onChange={(e) => onChangeServer(e.target.value)}
+      onChange={(e) => onChangeServer(e.target.value, index)}
       key={index}
       style={{ display: "flex", justifyContent: "center" }}
     >
       <Radio
-        value={`{"gameUserId":"${val.userId}","serverId":"${val.serverId}","serverName":"${val.serverName}"}`}
+        value={`{"gameUserId":"${val.userId}","serverId":"${val.serverId}","gameUserName":"${val.screenName}","serverName":"${val.serverName}"}`}
       >{`${val.serverName}-${val.screenName}`}</Radio>
     </Radio.Group>
   ));

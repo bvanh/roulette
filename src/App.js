@@ -147,7 +147,7 @@ function App() {
                 alt="btn_account"
               />
               <LogoutOutlined />
-              <span id="userName">{userName}</span>
+              <span id="userName" className={userName.length > 14 ? 'long-character' : ''}>{userName}</span>
             </div>
             <div
               onClick={() => handleOnModal(PICK_SERVER)}
@@ -159,7 +159,7 @@ function App() {
                 alt="btn_account"
               />
               <SwapOutlined />
-              <span id="userName">{gameUserName}</span>
+              <span id="userName" className={gameUserName?.length > 14 ? 'long-character' : ''}>{gameUserName}</span>
             </div>
           </div>
         );
@@ -245,7 +245,7 @@ function App() {
             src={img["btn_quay1lan.png"]}
             className={`btn-pointer ${disableButton} ${
               timesSpin === 1 ? "" : "isPickedTimesSpin"
-            }`}
+              }`}
             onClick={() => setTimesSpin(1)}
           />
         </Col>
@@ -254,7 +254,7 @@ function App() {
             src={img["btn_quay10lan.png"]}
             className={`btn-pointer ${disableButton} ${
               timesSpin === 10 ? "" : "isPickedTimesSpin"
-            }`}
+              }`}
             onClick={() => setTimesSpin(10)}
           />
         </Col>

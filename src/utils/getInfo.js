@@ -6,22 +6,22 @@ const getInfoCharacter = () => {
            return response;
         })
         .catch(e => {
-             console.log(e.response);
+             console.log(e);
         })
 }
 const getInfoSpin = (params) => {
     return baseGetInfoCharacter
-        .post(api.GET_INFO_SPIN, params)
+        .post(api.GET_INFO_SPIN, qs.stringify(params))
         .then(response => {
-            return response.data;
+            return response;
         })
         .catch(e => {
-            console.log(e.response)
+            console.log(e)
         })
 }
 const getResultSpin = (params) => {
     return baseGetInfoCharacter
-        .post(api.GET_RESULT_SPIN, params)
+        .post(api.GET_RESULT_SPIN, qs.stringify(params))
         .then(res => {
             console.log(res);
             return res;

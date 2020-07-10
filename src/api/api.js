@@ -4,6 +4,8 @@ import localStorageService from '../utils/localStorageService'
 const api = {
     ROOT: "https://test.api.spin.3qz.clappigames.com",
     AUTH_LOGIN: "/auth/login",
+    AUTH_GG_LOGIN: "/auth/login/gg",
+    AUTH_FB_LOGIN: "/auth/login/fb",
     GET_CHARACTER: "/private/characters",
     GET_INFO_SPIN: "/private/info",
     GET_RESULT_SPIN: "/private/spin",
@@ -32,6 +34,9 @@ baseLogin.interceptors.response.use((response) => {
 // getInforCharacter
 const baseGetInfoCharacter = axios.create({
     baseURL: api.ROOT,
+    headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+    },
 })
 baseGetInfoCharacter.interceptors.request.use((config) => {
     const token = localStorageService.getAccessToken();
@@ -46,7 +51,7 @@ baseGetInfoCharacter.interceptors.response.use(response => {
     return response;
 }, function (error) {
     const originalRequest = error.response.config;
-    console.log(error.response)
+    console.log(error)
     if (error.response.status !== 401) {
         // console.log(error)
         return Promise.reject(error);

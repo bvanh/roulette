@@ -13,6 +13,8 @@
     "qs": "^6.9.4",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
+    "react-facebook-login": "^4.1.1",
+    "react-google-login": "^5.1.21",
     "react-roulette-game": "^1.0.3",
     "react-scripts": "3.4.1",
     "surge": "^0.21.5"

@@ -61,6 +61,9 @@ $mobile-width: 767px;
         text-align: center;
         width: 65%;
         margin: 0 auto;
+        @include mobile(){
+          width: 100%;
+        }
         div{
           padding: .3rem 0;
         }
@@ -131,6 +134,21 @@ $mobile-width: 767px;
   .submit{
     div label{
       visibility: hidden;
+    }
+    .ant-form-item-label{
+      @include mobile(){
+        display: none;
+      }
+    }
+  }
+  .btn_login_gg{
+    background-color: transparent !important;
+    border: 0;
+    div{
+      display: none;
+    }
+    span{
+      padding: 0 !important;
     }
   }
 }
