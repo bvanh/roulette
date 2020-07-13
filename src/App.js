@@ -20,6 +20,7 @@ const {
   PICK_SERVER,
   MESSEAGE,
   LOGOUT,
+  ERROR
 } = typeModal;
 const rewards_arr = [
   "Mảnh Valkyrie*5",
@@ -40,6 +41,7 @@ function App() {
   const [indexModal, setIndexModal] = useState({
     isModal: LOGIN,
     visible: false,
+    status: null,
     message: "",
   });
   const [prize, setPrize] = useState([]);
@@ -53,12 +55,11 @@ function App() {
     timesSpin: 1,
     serverName: null,
     gameUserName: null,
-    serverId: 0,
-    gameUserId: 0,
+    positionUser: null
   });
   const [reset, setReset] = useState(false);
   const { isSpin, disableButton } = mustSpin;
-  const { gameUserName, serverName, currentTimesSpin, timesSpin } = indexSpin;
+  const { gameUserName, serverName, currentTimesSpin, timesSpin, positionUser } = indexSpin;
   const { isLogin, userName, password } = indexLogin;
   let set_prize = prize[0];
   let start = isSpin;
@@ -78,12 +79,13 @@ function App() {
     on_complete: (prize) => alertPrize(prize),
     prize_arr: rewards_arr,
   };
-  const handleOnModal = (isModal, message) => {
+  const handleOnModal = (isModal, message, status) => {
     setIndexModal({
       ...indexModal,
       visible: true,
       isModal: isModal,
       message: message,
+      status: status
     });
   };
   const handleOffModal = () => {
@@ -96,11 +98,9 @@ function App() {
     setIndexSpin({ ...indexSpin, timesSpin: 1 });
   };
   const startSpin = async () => {
-    const { timesSpin, gameUserId, serverId } = indexSpin;
     const isValidSpin = checkInfoSpin(
       isLogin,
-      gameUserId,
-      serverId,
+      positionUser,
       timesSpin,
       currentTimesSpin
     );
@@ -117,18 +117,23 @@ function App() {
         break;
       default:
         const params = {
-          gameUserId: gameUserId,
+          id: positionUser,
           spinTimes: timesSpin,
-          serverId: serverId,
         };
         await getResultSpin(params).then((result) => {
-          const { currentTimes, results } = result.data;
-          setPrize(results);
-          setIndexSpin({ ...indexSpin, currentTimesSpin: currentTimes });
-        });
-        setMustSpin({ ...mustSpin, isSpin: true });
-        setReset(false);
-        setMustSpin({ ...mustSpin, disableButton: "disable-spin" });
+          console.log(result)
+          const { data, status } = result;
+          if (status === 200) {
+            const { currentTimes, results } = data;
+            setPrize(results);
+            setIndexSpin({ ...indexSpin, currentTimesSpin: currentTimes });
+            setMustSpin({ ...mustSpin, isSpin: true });
+            setReset(false);
+            setMustSpin({ ...mustSpin, disableButton: "disable-spin" });
+          } else {
+            handleOnModal(ERROR, data.message, status)
+          }
+        })
         break;
     }
   };

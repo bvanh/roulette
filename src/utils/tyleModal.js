@@ -5,6 +5,7 @@ const typeModal = {
     ALERT_REWARD: "CHÚC MỪNG",
     PICK_SERVER: "CHON_SERVER",
     MESSEAGE: "message",
-    LOGOUT:"LOGOUT"
+    LOGOUT: "LOGOUT",
+    ERROR: "ERROR"
 }
 export default typeModal;

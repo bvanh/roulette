@@ -3,15 +3,17 @@ const listError = {
     GAMEUSER_ERROR: "CHỌN THÔNG TIN NHÂN VẬT TRƯỚC KHI QUAY !",
     TIMESPIN_ERROR: "SỐ LƯỢT QUAY KHÔNG ĐỦ !"
 }
-const checkInfoSpin = (isLogin, gameUserId, serverId, timesSpin, currentTimesSpin) => {
+const checkInfoSpin = (isLogin, positionUser, timesSpin, currentTimesSpin) => {
     const { GAMEUSER_ERROR, TIMESPIN_ERROR, ACCOUNT_ERROR } = listError;
     const isValidSpin = 0 < timesSpin && timesSpin <= currentTimesSpin;
-    const isValidUserInfo = gameUserId === 0 && serverId === 0;
+    console.log(positionUser)
     if (!isLogin) {
         return ACCOUNT_ERROR;
-    } else if (isValidUserInfo) {
+    }
+    if (positionUser===null) {
         return GAMEUSER_ERROR;
-    } else if (!isValidSpin) {
+    }
+    if (!isValidSpin) {
         return TIMESPIN_ERROR;
     }
 }

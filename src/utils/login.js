@@ -1,4 +1,4 @@
-import {baseLogin, baseGetInfoCharacter } from "../api/api";
+import { baseLogin, baseGetInfoCharacter } from "../api/baseApi";
 import qs from "qs";
 const login = (path, params, username) => {
     return baseLogin

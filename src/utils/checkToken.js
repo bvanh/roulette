@@ -1,4 +1,3 @@
-import { api, baseLogin, refreshToken } from "../api/api";
 
 function checkAccessToken() {
     const currentTime = new Date().getTime();
@@ -17,26 +16,5 @@ function checkAccessToken() {
         return false;
     }
 }
-const getRefreshToken = () => {
-    const tokenRoulette = JSON.parse(localStorage.getItem("tokenRoulette"));
-    refreshToken
-        .post(api.REFRESH_TOKEN, {
-            refreshToken: tokenRoulette.token.refreshToken,
-        })
-        .then((response) => {
-            console.log(response.data);
-            let userAccessToken = {
-                accessToken: response.data.accessToken,
-                timestamp: new Date().getTime(),
-            };
-            localStorage.setItem(
-                "accessTokenRoulette",
-                JSON.stringify(userAccessToken)
-            );
-        })
-        .catch((error) => {
-            console.log(error);
-        });
-};
 
-export { checkAccessToken, getRefreshToken };
+export { checkAccessToken};

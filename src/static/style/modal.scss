@@ -43,10 +43,11 @@ $mobile-width: 767px;
           img {
             width: 45%;
           }
-          .CHON_SERVER,.TÀI{
+          .CHON_SERVER,
+          .TÀI {
             width: 70%;
           }
-          .message{
+          .message {
             width: 23%;
           }
         }
@@ -54,6 +55,9 @@ $mobile-width: 767px;
     }
     .ant-modal-body {
       padding: 0 32px 32px;
+      @include mobile(){
+        padding: 0 8px 32px;
+      }
       div .ant-radio-wrapper {
         color: #f3e88c;
       }
@@ -61,11 +65,12 @@ $mobile-width: 767px;
         text-align: center;
         width: 65%;
         margin: 0 auto;
-        @include mobile(){
+        @include mobile() {
+          padding: 0 4px;
           width: 100%;
         }
-        div{
-          padding: .3rem 0;
+        div {
+          padding: 0.3rem 0;
         }
         h2 {
           color: #f3e88c;
@@ -74,18 +79,19 @@ $mobile-width: 767px;
         }
       }
       .alert-error {
-        h2{
+        h1,
+        h2 {
           color: #f3e88c;
-          @include mobile(){
+          @include mobile() {
             font-size: 1rem;
           }
         }
         text-align: center;
       }
-      .alert-logout{
-        @include mobile(){
-          img{
-            padding: .5rem;
+      .alert-logout {
+        @include mobile() {
+          img {
+            padding: 0.5rem;
           }
         }
       }
@@ -122,7 +128,7 @@ $mobile-width: 767px;
   .ant-radio-inner::after {
     background-color: #cdb150;
   }
-  .ant-radio-wrapper{
+  .ant-radio-wrapper {
     font-size: 1rem;
   }
   .ant-radio-wrapper-checked span input:focus {
@@ -131,24 +137,39 @@ $mobile-width: 767px;
   .ant-radio-input:focus + .ant-radio-inner {
     border-color: #cdb150;
   }
-  .submit{
-    div label{
+  .ant-form-item-control-input-content {
+    display: flex;
+    align-items: flex-end;
+    a {
+      margin-left: 0.5rem;
+      color: #f7f095;
+    }
+  }
+  .submit {
+    div label {
       visibility: hidden;
     }
-    .ant-form-item-label{
-      @include mobile(){
+    .ant-form-item-label {
+      @include mobile() {
         display: none;
       }
     }
   }
-  .btn_login_gg{
+  .btn_login_gg {
     background-color: transparent !important;
     border: 0;
-    div{
+    div {
       display: none;
     }
-    span{
+    span {
       padding: 0 !important;
+    }
+  }
+  .btn_login {
+    width: 130px;
+    height: 28.6px;
+    @include mobile() {
+      width: 105px;
     }
   }
 }

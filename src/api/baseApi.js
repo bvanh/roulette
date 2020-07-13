@@ -1,16 +1,6 @@
 import axios from 'axios';
-import { checkAccessToken, getRefreshToken } from '../utils/checkToken';
 import localStorageService from '../utils/localStorageService'
-const api = {
-    ROOT: "https://test.api.spin.3qz.clappigames.com",
-    AUTH_LOGIN: "/auth/login",
-    AUTH_GG_LOGIN: "/auth/login/gg",
-    AUTH_FB_LOGIN: "/auth/login/fb",
-    GET_CHARACTER: "/private/characters",
-    GET_INFO_SPIN: "/private/info",
-    GET_RESULT_SPIN: "/private/spin",
-    REFRESH_TOKEN: "/auth/renew/access"
-}
+import api from './apiUrl'
 // refreshToken
 const refreshToken = axios.create({
     baseURL: api.ROOT
@@ -45,16 +35,15 @@ baseGetInfoCharacter.interceptors.request.use((config) => {
         return config;
     }
 }, error => {
-    Promise.reject(error)
+    return error
 })
 baseGetInfoCharacter.interceptors.response.use(response => {
     return response;
 }, function (error) {
     const originalRequest = error.response.config;
-    console.log(error)
     if (error.response.status !== 401) {
         // console.log(error)
-        return Promise.reject(error);
+        return error.response;
     }
     const tokenRoulette = JSON.parse(localStorage.getItem("tokenRoulette"));
     return refreshToken.post(api.REFRESH_TOKEN, {
@@ -79,4 +68,4 @@ baseGetInfoCharacter.interceptors.response.use(response => {
         })
 
 })
-export { api, baseLogin, baseGetInfoCharacter, refreshToken }
+export {baseLogin, baseGetInfoCharacter, refreshToken }
