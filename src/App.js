@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import Roulette from "react-roulette-game";
-import { Row, Col } from "antd";
+import { Row, Col, message } from "antd";
 import { img } from "./utils/importImg";
 import FormAlert from "./components/modal";
-import typeModal from "./utils/tyleModal";
+import { typeModal, rewards } from "./utils/indexModal";
 import localStorageService from "./utils/localStorageService";
 import { getResultSpin } from "./utils/getInfo";
 import { checkInfoSpin, listError } from "./utils/checkInfo";
@@ -22,17 +22,7 @@ const {
   LOGOUT,
   ERROR
 } = typeModal;
-const rewards_arr = [
-  "Mảnh Valkyrie*5",
-  "Mảnh Caroline*3",
-  "Vàng*10.000",
-  "Quyền triệu hồi vũ khí cao cấp*1",
-  "Ruby*100",
-  "Triệu hồi 10+1 lần lực lượng",
-  "Áo 3Q Phản Công",
-  "Triệu hồi 10+1 lần trang bị",
-  "Móc khóa 3Q Phản Công",
-];
+const { GAMEUSER_ERROR, TIMESPIN_ERROR, ACCOUNT_ERROR } = listError;
 function App() {
   const [mustSpin, setMustSpin] = useState({
     isSpin: false,
@@ -77,16 +67,33 @@ function App() {
     set_prize,
     reset,
     on_complete: (prize) => alertPrize(prize),
-    prize_arr: rewards_arr,
+    prize_arr: rewards,
   };
-  const handleOnModal = (isModal, message, status) => {
+  const setIndexOnModal = (isModal, messageModal, status) => {
     setIndexModal({
       ...indexModal,
       visible: true,
       isModal: isModal,
-      message: message,
+      message: messageModal,
       status: status
     });
+  }
+  const handleOnModal = (isModal, message, status) => {
+    switch (isModal) {
+      case HISTORY:
+        switch (positionUser) {
+          case null:
+            handleOnModal(MESSEAGE, GAMEUSER_ERROR);
+            break;
+          default:
+            setIndexOnModal(isModal, message, status)
+            break;
+        }
+        break;
+      default:
+        setIndexOnModal(isModal, message, status)
+        break;
+    }
   };
   const handleOffModal = () => {
     setIndexModal({ ...indexModal, visible: false });
@@ -104,7 +111,6 @@ function App() {
       timesSpin,
       currentTimesSpin
     );
-    const { GAMEUSER_ERROR, TIMESPIN_ERROR, ACCOUNT_ERROR } = listError;
     switch (isValidSpin) {
       case ACCOUNT_ERROR:
         handleOnModal(MESSEAGE, ACCOUNT_ERROR);
@@ -188,7 +194,6 @@ function App() {
         indexModal={indexModal}
         indexLogin={indexLogin}
         prize={prize}
-        rewards={rewards_arr}
         indexSpin={indexSpin}
         handleOffModal={handleOffModal}
         handleOnModal={handleOnModal}

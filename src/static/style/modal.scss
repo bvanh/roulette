@@ -55,7 +55,7 @@ $mobile-width: 767px;
     }
     .ant-modal-body {
       padding: 0 32px 32px;
-      @include mobile(){
+      @include mobile() {
         padding: 0 8px 32px;
       }
       div .ant-radio-wrapper {
@@ -163,6 +163,7 @@ $mobile-width: 767px;
     }
     span {
       padding: 0 !important;
+      opacity: 1 !important;
     }
   }
   .btn_login {
@@ -171,5 +172,66 @@ $mobile-width: 767px;
     @include mobile() {
       width: 105px;
     }
+  }
+  // history
+  .ant-table {
+    background: transparent;
+    color: white;
+    table {
+      text-align: center;
+    }
+  }
+  .ant-table-thead > tr > th {
+    background: transparent;
+    color: white;
+    text-align: center;
+  }
+  .ant-table-tbody > tr {
+    td:nth-child(1) {
+      border-left: 1px solid;
+    }
+    td {
+      border-right: 1px solid;
+    }
+  }
+  .ant-table-row:hover td {
+    background: transparent !important;
+  }
+  .ant-pagination-options {
+    display: none;
+  }
+  .ant-pagination-item {
+    :hover {
+      color: white;
+    }
+    a {
+      color: white;
+    }
+  }
+  .mini {
+    margin-top: 1rem;
+    text-align: center;
+  }
+  .ant-pagination-item-active {
+    background: #fff0;
+    border-color: #fdfdfd;
+    border-radius: 100%;
+  }
+  .ant-pagination-item-active:hover,
+  .ant-pagination-item-active:focus {
+    border-color: white;
+    a {
+      color: white;
+    }
+  }
+  .ant-pagination-next,
+  .ant-pagination-prev {
+    button {
+      color: white;
+      cursor: pointer;
+    }
+  }
+  .ant-pagination-disabled button {
+    color: #8c8b8b !important;
   }
 }

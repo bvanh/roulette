@@ -6,7 +6,7 @@ const listError = {
 const checkInfoSpin = (isLogin, positionUser, timesSpin, currentTimesSpin) => {
     const { GAMEUSER_ERROR, TIMESPIN_ERROR, ACCOUNT_ERROR } = listError;
     const isValidSpin = 0 < timesSpin && timesSpin <= currentTimesSpin;
-    console.log(positionUser)
+    // console.log(positionUser)
     if (!isLogin) {
         return ACCOUNT_ERROR;
     }

@@ -6,6 +6,7 @@ const api = {
     GET_CHARACTER: "/private/characters",
     GET_INFO_SPIN: "/private/info",
     GET_RESULT_SPIN: "/private/spin",
+    GET_HISTORY_SPIN: "/private/history",
     REFRESH_TOKEN: "/auth/renew/access"
 }
 export default api;

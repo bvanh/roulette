@@ -1,15 +1,29 @@
 import React, { useState, useMemo, useEffect } from "react";
-import { Modal, Form, Input, Button, Radio, Row, Col } from "antd";
+import {
+  Modal,
+  Form,
+  Input,
+  Button,
+  Radio,
+  Row,
+  Col,
+  Table,
+  Pagination,
+} from "antd";
 import "../static/style/modal.scss";
-import typeModal from "../utils/tyleModal";
+import { typeModal, rewards } from "../utils/indexModal";
 import { imgRewards, img } from "../utils/importImg";
 import { login } from "../utils/login";
-import { getInfoCharacter, getInfoSpin } from "../utils/getInfo";
+import {
+  getInfoCharacter,
+  getInfoSpin,
+  getHistorySpin,
+} from "../utils/getInfo";
 import api from "../api/apiUrl";
-import { GoogleLogin } from "react-google-login";
+import { GoogleLogin,GoogleLogout } from "react-google-login";
 import FacebookLogin from "react-facebook-login/dist/facebook-login-render-props";
 import localStorageService from "../utils/localStorageService";
-import { BackwardOutlined } from '@ant-design/icons'
+import moment from "moment";
 const socialId = {
   googleClappiId:
     "1082828967661-iqn44j6piegilfd75p2718o71tdabe4e.apps.googleusercontent.com",
@@ -31,7 +45,8 @@ const layout = {
 };
 const FormAlert = (props) => {
   const { visible, isModal, message, status } = props.indexModal;
-  const { prize, rewards, indexLogin, indexSpin } = props;
+  const { prize, indexLogin, indexSpin } = props;
+  const { gameUserName, serverName } = indexSpin;
   const [typeLogin, setTypeLogin] = useState({
     isTypeLogin: "",
   });
@@ -43,8 +58,15 @@ const FormAlert = (props) => {
       screenName: "",
     },
   ]);
+  const [indexHistory, setIndexHistory] = useState({
+    pageSize: 10,
+    currentPage: 1,
+    count: null,
+    listHistory: [],
+  });
   const [messageError, setMessageError] = useState("");
   const { isTypeLogin } = typeLogin;
+  const { listHistory, count, pageSize, currentPage } = indexHistory;
   useEffect(() => {
     switch (isModal) {
       case PICK_SERVER:
@@ -90,16 +112,15 @@ const FormAlert = (props) => {
     props.setIndexLogin({ ...indexLogin, isLogin: false });
     props.handleOffModal();
     resetData();
-    setTypeLogin({ isTypeLogin: "" })
+    setTypeLogin({ isTypeLogin: "" });
   };
   const resetData = () => {
     props.setSpin({
-      ...indexSpin,
+      timesSpin: 1,
       currentTimesSpin: 0,
-      serverName: "",
-      gameUserName: "",
-      gameUserId: 0,
-      serverId: 0,
+      serverName: null,
+      gameUserName: null,
+      positionUser: null,
     });
   };
   const onFieldsChange = () => {
@@ -108,8 +129,9 @@ const FormAlert = (props) => {
   const onChangeServer = (value, index) => {
     const convertValue = JSON.parse(value);
     const { gameUserId, serverId, gameUserName, serverName } = convertValue;
-    getInfoSpin({ id: index }).then((dataSpin) => {
-      console.log(dataSpin);
+    const positionUser = { id: index };
+    getInfoSpin(positionUser).then((dataSpin) => {
+      // console.log(dataSpin);
       const { data, status } = dataSpin;
       if (status === 200) {
         const { currentTimes } = data;
@@ -124,27 +146,83 @@ const FormAlert = (props) => {
         props.handleOnModal(ERROR, data.message, status);
       }
     });
+    getHistorySpin({ ...indexHistory, ...positionUser }).then((res) => {
+      // console.log(res);
+      const { data, status } = res;
+      if (status === 200) {
+        const { rows, count } = data.rewards;
+        setIndexHistory({ ...indexHistory, listHistory: rows, count: count });
+      } else {
+        props.handleOnModal(ERROR, data.message, status);
+      }
+    });
   };
   const onFinishFailed = (val) => {
     console.log(val);
   };
-  const responseGoogle = (val) => {
-    if (val) {
+  const responseGoogleOk = (val) => {
       const { tokenId, profileObj } = val;
       login(
         api.AUTH_GG_LOGIN,
         { accessToken: tokenId },
         { username: profileObj.email }
-      ).then((userToken) => {
-        console.log(userToken);
+      ).then((res) => {
+        // console.log(res);
+        const { data, status } = res;
+        switch (status) {
+          case 200:
+            resetData();
+            props.setIndexLogin({ isLogin: true, userName: profileObj.email });
+            getInfoCharacter().then(async (response) => {
+              const { status, data } = response;
+              switch (status) {
+                case 200:
+                  await setUserInfo(data);
+                  props.handleOnModal(PICK_SERVER);
+                  break;
+                default:
+                  props.handleOnModal(ERROR, "", status);
+                  break;
+              }
+            });
+            break;
+          default:
+            setMessageError(data.message);
+            break;
+        }
       });
-      props.setIndexLogin({ isLogin: true, userName: profileObj.email });
-      props.handleOffModal();
-    }
-    // console.log(val);
   };
+  const responseGoogleNg=val=>{
+    console.log(val)
+  }
+  const responseGoogleLogout=(val)=>{
+    console.log(val)
+  }
   const responseFacebook = (val) => {
     console.log(val);
+  };
+  const onChangePageHistory = (val) => {
+    // console.log(val)
+    const { positionUser } = indexSpin;
+    getHistorySpin({
+      ...indexHistory,
+      id: positionUser,
+      currentPage: val,
+    }).then((res) => {
+      // console.log(res);
+      const { data, status } = res;
+      if (status === 200) {
+        const { rows, count } = data.rewards;
+        setIndexHistory({
+          ...indexHistory,
+          listHistory: rows,
+          count: count,
+          currentPage: val,
+        });
+      } else {
+        props.handleOnModal(ERROR, data.message, status);
+      }
+    });
   };
   const printModal = () => {
     switch (isModal) {
@@ -201,18 +279,67 @@ const FormAlert = (props) => {
               onClick={() => props.handleOffModal()}
               className="btn-pointer"
             />
-
-            <img
+            <GoogleLogout
+              clientId={socialId.googleClappiId}
+              onSuccess={responseGoogleLogout}
+              onFailure={responseGoogleLogout}
+              className="btn_login_gg"
+              isSignedIn={false}
+              // responseType="id_token"
+            >
+              <img
               src={img["btn_enter.png"]}
               onClick={logOut}
               className="btn-pointer"
             />
+            </GoogleLogout>
           </Row>
         );
       default:
+        return (
+          <>
+            <Table
+              dataSource={listHistory}
+              columns={columns}
+              pagination={false}
+            />
+            <Pagination
+              total={count}
+              current={currentPage}
+              onChange={onChangePageHistory}
+              size="small"
+            />
+          </>
+        );
         break;
     }
   };
+  const columns = [
+    {
+      title: "Tên nhân vật",
+      dataIndex: "",
+      key: "name",
+      render: (text) => (
+        <span>
+          {serverName}-{gameUserName}
+        </span>
+      ),
+    },
+    {
+      title: "Thời gian",
+      dataIndex: "createdDate",
+      key: "time",
+      render: (index) => (
+        <span>{moment(index).format("HH:ss DD/MM/YYYY")}</span>
+      ),
+    },
+    {
+      title: "Vật phẩm",
+      dataIndex: "reward",
+      key: "reward",
+      render: (index) => <span>{rewards[index]}</span>,
+    },
+  ];
   const printRewards = (arrRewards) => {
     return arrRewards.map((val, index) => (
       <Row key={index} type="flex" align="middle" justify="space-between">
@@ -225,7 +352,7 @@ const FormAlert = (props) => {
     switch (isTypeLogin) {
       case "":
         return (
-          <Row type="flex" justify="space-around" align='center'>
+          <Row type="flex" justify="space-around" align="center">
             <img
               src={img["btn_login_clappi.png"]}
               className="btn-pointer btn_login"
@@ -235,10 +362,11 @@ const FormAlert = (props) => {
             />
             <GoogleLogin
               clientId={socialId.googleClappiId}
-              onSuccess={responseGoogle}
-              onFailure={responseGoogle}
+              onSuccess={responseGoogleOk}
+              onFailure={responseGoogleNg}
               className="btn_login_gg"
               isSignedIn={false}
+              // responseType="id_token"
             >
               <img
                 src={img["btn_login_gg.png"]}
@@ -314,7 +442,7 @@ const FormAlert = (props) => {
         onOk={() => props.handleOffModal()}
         onCancel={() => props.handleOffModal()}
         footer={null}
-        style={{ top: 200 }}
+        style={{ top: 180 }}
       >
         {printModal()}
       </Modal>
