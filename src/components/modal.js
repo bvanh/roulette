@@ -20,7 +20,7 @@ import {
   getHistorySpin,
 } from "../utils/getInfo";
 import api from "../api/apiUrl";
-import { GoogleLogin, GoogleLogout } from "react-google-login";
+import GoogleLogin from "react-google-login";
 import FacebookLogin from "react-facebook-login/dist/facebook-login-render-props";
 // import { FacebookLogout } from 'react-facebook-login'
 import localStorageService from "../utils/localStorageService";
@@ -116,9 +116,6 @@ const FormAlert = (props) => {
     props.handleOffModal();
     resetData();
     setTypeLogin({ isTypeLogin: "", demo: null });
-    window.FB.logout(function (response) {
-      // console.log(response)
-    })
   };
   const resetData = () => {
     props.setSpin({
@@ -207,7 +204,7 @@ const FormAlert = (props) => {
     // console.log(val)
   }
   const responseFacebook = (val) => {
-    // console.log(val)
+    console.log(val)
     if (val?.accessToken) {
       const { accessToken, name } = val
       login(
@@ -321,20 +318,20 @@ const FormAlert = (props) => {
               onClick={() => props.handleOffModal()}
               className="btn-pointer"
             />
-            <GoogleLogout
+            {/* <GoogleLogout
               clientId={socialId.googleClappiId}
               onSuccess={responseGoogleLogout}
               onFailure={responseGoogleLogout}
               className="btn_login_gg"
               isSignedIn={false}
             // responseType="id_token"
-            >
-              <img
-                src={img["btn_enter.png"]}
-                onClick={logOut}
-                className="btn-pointer"
-              />
-            </GoogleLogout>
+            > */}
+            <img
+              src={img["btn_enter.png"]}
+              onClick={logOut}
+              className="btn-pointer"
+            />
+            {/* </GoogleLogout> */}
           </Row>
         );
       default:
@@ -395,8 +392,6 @@ const FormAlert = (props) => {
       case "":
         return (
           <Row type="flex" justify="space-around" align="center">
-            {/* <button onClick={onLogout1}>log</button>
-            <button onClick={onLogout3}>log3</button> */}
             <img
               src={img["btn_login_clappi.png"]}
               className="btn-pointer btn_login"
@@ -409,14 +404,15 @@ const FormAlert = (props) => {
               clientId={socialId.googleClappiId}
               onSuccess={responseGoogleOk}
               onFailure={responseGoogleNg}
-              className="btn_login_gg"
               isSignedIn={false}
-            // responseType="id_token"
+              render={(renderProps) => (
+                <img
+                  src={img["btn_login_gg.png"]}
+                  className="btn-pointer btn_login"
+                  onClick={renderProps.onClick}
+                />
+              )}
             >
-              <img
-                src={img["btn_login_gg.png"]}
-                className="btn-pointer btn_login"
-              />
             </GoogleLogin>
             <FacebookLogin
               appId={socialId.facebook3qId}
