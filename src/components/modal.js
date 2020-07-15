@@ -117,7 +117,7 @@ const FormAlert = (props) => {
     resetData();
     setTypeLogin({ isTypeLogin: "", demo: null });
     window.FB.logout(function (response) {
-      console.log(response)
+      // console.log(response)
     })
   };
   const resetData = () => {
@@ -167,17 +167,6 @@ const FormAlert = (props) => {
   const onFinishFailed = (val) => {
     console.log(val);
   };
-  const onLogout1 = () => {
-    window.FB.login(function (response) {
-      console.log(response)
-
-    }, { scope: 'public_profile,email' })
-  }
-  const onLogout3 = () => {
-    window.FB.logout(function (response) {
-      console.log(response)
-    })
-  }
   const responseGoogleOk = (val) => {
     const { tokenId, profileObj } = val;
     login(
@@ -217,36 +206,37 @@ const FormAlert = (props) => {
     console.log(val)
   }
   const responseFacebook = (val) => {
-    // console.log(val);
-    const { accessToken, name } = val;
-    login(
-      api.AUTH_GG_LOGIN,
-      { accessToken: accessToken },
-      { username: name }
-    ).then((res) => {
-      const { data, status } = res;
-      switch (status) {
-        case 200:
-          resetData();
-          props.setIndexLogin({ isLogin: true, userName: name });
-          getInfoCharacter().then(async (response) => {
-            const { status, data } = response;
-            switch (status) {
-              case 200:
-                await setUserInfo(data);
-                props.handleOnModal(PICK_SERVER);
-                break;
-              default:
-                props.handleOnModal(ERROR, "", status);
-                break;
-            }
-          });
-          break;
-        default:
-          props.handleOnModal(ERROR, data.message, status);
-          break;
-      }
-    });
+    if(val?.accessToken){
+      const {accessToken,name}=val
+      login(
+        api.AUTH_GG_LOGIN,
+        { accessToken: accessToken },
+        { username: name }
+      ).then((res) => {
+        const { data, status } = res;
+        switch (status) {
+          case 200:
+            resetData();
+            props.setIndexLogin({ isLogin: true, userName: name });
+            getInfoCharacter().then(async (response) => {
+              const { status, data } = response;
+              switch (status) {
+                case 200:
+                  await setUserInfo(data);
+                  props.handleOnModal(PICK_SERVER);
+                  break;
+                default:
+                  props.handleOnModal(ERROR, "", status);
+                  break;
+              }
+            });
+            break;
+          default:
+            props.handleOnModal(ERROR, data.message, status);
+            break;
+        }
+      });
+    }  
   };
   const onChangePageHistory = (val) => {
     // console.log(val)
