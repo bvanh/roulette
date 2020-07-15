@@ -18,7 +18,7 @@ baseLogin.interceptors.response.use((response) => {
     }
     return response;
 }, error => {
-    console.log(error.response)
+    // console.log(error.response)
     throw error;
 })
 // getInforCharacter
@@ -50,7 +50,7 @@ baseGetInfoCharacter.interceptors.response.use(response => {
         "refreshToken": tokenRoulette.token.refreshToken
     })
         .then(response => {
-            console.log(response)
+            // console.log(response)
             let userAccessToken = {
                 accessToken: response.data.accessToken,
                 timestamp: new Date().getTime(),
@@ -63,7 +63,7 @@ baseGetInfoCharacter.interceptors.response.use(response => {
             return axios(originalRequest);
         }).catch(error => {
             /*destroyToken();*/
-            console.log(error)
+            // console.log(error)
             return Promise.reject(error);
         })
 
