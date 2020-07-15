@@ -8,7 +8,7 @@ const getInfoCharacter = () => {
             return response;
         })
         .catch((e) => {
-            console.log(e);
+            // console.log(e);
         });
 };
 const getInfoSpin = (params) => {
