@@ -127,7 +127,7 @@ function App() {
           spinTimes: timesSpin,
         };
         await getResultSpin(params).then((result) => {
-          console.log(result)
+          // console.log(result)
           const { data, status } = result;
           if (status === 200) {
             const { currentTimes, results } = data;

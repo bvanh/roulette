@@ -17,17 +17,4 @@ const checkInfoSpin = (isLogin, positionUser, timesSpin, currentTimesSpin) => {
         return TIMESPIN_ERROR;
     }
 }
-function detectIEEdge() {
-    var ua = window.navigator.userAgent;
-
-    var msie = ua.indexOf('MSIE ');
-    console.log(ua)
-    if (msie > 0) {
-        // IE 10 or older => return version number
-        // return parseInt(ua.substring(msie + 5, ua.indexOf('.', msie)), 10);
-        console.log(msie)
-    }
-    // other browser
-    return false;
-}
-export { checkInfoSpin, listError, detectIEEdge }
+export { checkInfoSpin, listError }
