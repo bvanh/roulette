@@ -25,6 +25,7 @@ import FacebookLogin from "react-facebook-login/dist/facebook-login-render-props
 // import { FacebookLogout } from 'react-facebook-login'
 import localStorageService from "../utils/localStorageService";
 import moment from "moment";
+import { VerticalAlignBottomOutlined } from "@ant-design/icons";
 const socialId = {
   googleClappiId:
     "1082828967661-iqn44j6piegilfd75p2718o71tdabe4e.apps.googleusercontent.com",
@@ -44,6 +45,7 @@ const {
 const layout = {
   labelCol: { span: 4 },
   wrapperCol: { span: 16 },
+  align:"center"
 };
 const FormAlert = (props) => {
   const { visible, isModal, message, status } = props.indexModal;
@@ -85,30 +87,33 @@ const FormAlert = (props) => {
     }
   }, [isModal]);
   const onFinish = async (values) => {
-    login(api.AUTH_LOGIN, values, values).then((res) => {
-      const { data, status } = res;
-      switch (status) {
-        case 200:
-          resetData();
-          props.setIndexLogin({ isLogin: true, userName: values.username });
-          getInfoCharacter().then(async (response) => {
-            const { status, data } = response;
-            switch (status) {
-              case 200:
-                await setUserInfo(data);
-                props.handleOnModal(PICK_SERVER);
-                break;
-              default:
-                props.handleOnModal(ERROR, "", status);
-                break;
-            }
-          });
-          break;
-        default:
-          setMessageError(data.message);
-          break;
-      }
-    });
+    const { username, password } = values
+    if (username) {
+      login(api.AUTH_LOGIN, values, values).then((res) => {
+        const { data, status } = res;
+        switch (status) {
+          case 200:
+            resetData();
+            props.setIndexLogin({ isLogin: true, userName: values.username });
+            getInfoCharacter().then(async (response) => {
+              const { status, data } = response;
+              switch (status) {
+                case 200:
+                  await setUserInfo(data);
+                  props.handleOnModal(PICK_SERVER);
+                  break;
+                default:
+                  props.handleOnModal(ERROR, "", status);
+                  break;
+              }
+            });
+            break;
+          default:
+            setMessageError(data.message);
+            break;
+        }
+      });
+    }
   };
   const logOut = () => {
     localStorageService.resetToken();
@@ -318,20 +323,11 @@ const FormAlert = (props) => {
               onClick={() => props.handleOffModal()}
               className="btn-pointer"
             />
-            {/* <GoogleLogout
-              clientId={socialId.googleClappiId}
-              onSuccess={responseGoogleLogout}
-              onFailure={responseGoogleLogout}
-              className="btn_login_gg"
-              isSignedIn={false}
-            // responseType="id_token"
-            > */}
             <img
               src={img["btn_enter.png"]}
               onClick={logOut}
               className="btn-pointer"
             />
-            {/* </GoogleLogout> */}
           </Row>
         );
       default:
@@ -432,10 +428,10 @@ const FormAlert = (props) => {
         return (
           <Form
             {...layout}
-            name="basic"
             onFinish={onFinish}
             onFinishFailed={onFinishFailed}
             onFieldsChange={onFieldsChange}
+            layout=''
           >
             <Form.Item label="Tên đăng nhập" name="username">
               <Input />
@@ -457,7 +453,7 @@ const FormAlert = (props) => {
                   style={{ width: "130px", left: "15px" }}
                 />
               </Button>
-              <a onClick={() => setTypeLogin({ isTypeLogin: "" })}>Quay lại</a>
+              {/* <a onClick={() => setTypeLogin({ isTypeLogin: "" })}>Quay lại</a> */}
             </Form.Item>
           </Form>
         );
@@ -482,9 +478,12 @@ const FormAlert = (props) => {
         closeIcon={<img src={img["close_modal.png"]} />}
         visible={visible}
         onOk={() => props.handleOffModal()}
-        onCancel={() => props.handleOffModal()}
+        onCancel={() => {
+          setTypeLogin({ isTypeLogin: "" })
+          props.handleOffModal()
+        }}
         footer={null}
-        style={{ top: 180 }}
+        style={isModal === ALERT_REWARD ? { top: 80 } : { top: 150 }}
       >
         {printModal()}
       </Modal>

@@ -6,7 +6,7 @@ import FormAlert from "./components/modal";
 import { typeModal, rewards } from "./utils/indexModal";
 import localStorageService from "./utils/localStorageService";
 import { getResultSpin } from "./utils/getInfo";
-import { checkInfoSpin, listError } from "./utils/checkInfo";
+import { checkInfoSpin, listError, detectIEEdge } from "./utils/checkInfo";
 import { SwapOutlined, LogoutOutlined } from "@ant-design/icons";
 import "./App.scss";
 import { checkAccessToken } from "./utils/checkToken";
@@ -58,6 +58,9 @@ function App() {
       localStorageService.resetToken();
       setIndexLogin({ ...indexLogin, isLogin: false });
     }
+    detectIEEdge();
+    const div = document.createElement('div');
+    div.classList.remove("ant-form-horizontal");
   }, []);
   const roulette_props = {
     roulette_img_under_highlight,
@@ -113,7 +116,7 @@ function App() {
     );
     switch (isValidSpin) {
       case ACCOUNT_ERROR:
-        handleOnModal(MESSEAGE, ACCOUNT_ERROR);
+        handleOnModal(LOGIN);
         break;
       case GAMEUSER_ERROR:
         handleOnModal(MESSEAGE, GAMEUSER_ERROR);
