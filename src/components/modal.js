@@ -168,6 +168,7 @@ const FormAlert = (props) => {
     console.log(val);
   };
   const responseGoogleOk = (val) => {
+    console.log(val)
     const { tokenId, profileObj } = val;
     login(
       api.AUTH_GG_LOGIN,
@@ -200,16 +201,17 @@ const FormAlert = (props) => {
     });
   };
   const responseGoogleNg = val => {
-    console.log(val)
+    // console.log(val)
   }
   const responseGoogleLogout = (val) => {
-    console.log(val)
+    // console.log(val)
   }
   const responseFacebook = (val) => {
-    if(val?.accessToken){
-      const {accessToken,name}=val
+    // console.log(val)
+    if (val?.accessToken) {
+      const { accessToken, name } = val
       login(
-        api.AUTH_GG_LOGIN,
+        api.AUTH_FB_LOGIN,
         { accessToken: accessToken },
         { username: name }
       ).then((res) => {
@@ -236,7 +238,7 @@ const FormAlert = (props) => {
             break;
         }
       });
-    }  
+    }
   };
   const onChangePageHistory = (val) => {
     // console.log(val)
