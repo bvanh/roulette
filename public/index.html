@@ -5,10 +5,7 @@
     <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#000000" />
-    <meta
-      name="description"
-      content="3Q phản công-Vòng quay nhân phẩm"
-    />
+    <meta name="description" content="3Q phản công-Vòng quay nhân phẩm" />
     <meta
       property="og:image"
       content="https://api.lussom.vn/uploads/thumnail_roulette_d8c8a0d32e.png"
@@ -51,5 +48,27 @@
       To begin the development, run `npm start` or `yarn start`.
       To create a production bundle, use `npm run build` or `yarn build`.
     -->
+    <script>
+      window.fbAsyncInit = function () {
+        FB.init({
+          appId: "630380541117442",
+          xfbml: true,
+          version: "v7.0",
+          status: true,
+        });
+        FB.AppEvents.logPageView();
+      };
+      (function (d, s, id) {
+        var js,
+          fjs = d.getElementsByTagName(s)[0];
+        if (d.getElementById(id)) {
+          return;
+        }
+        js = d.createElement(s);
+        js.id = id;
+        js.src = "//connect.facebook.net/en_US/sdk.js";
+        fjs.parentNode.insertBefore(js, fjs);
+      })(document, "script", "facebook-jssdk");
+    </script>
   </body>
 </html>

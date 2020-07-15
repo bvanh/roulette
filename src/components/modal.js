@@ -116,9 +116,13 @@ const FormAlert = (props) => {
     props.handleOffModal();
     resetData();
     setTypeLogin({ isTypeLogin: "", demo: null });
+    window.FB.logout(function (response) {
+      console.log(response)
+    })
   };
   const resetData = () => {
     props.setSpin({
+      ...indexSpin,
       timesSpin: 1,
       currentTimesSpin: 0,
       serverName: null,
@@ -164,7 +168,15 @@ const FormAlert = (props) => {
     console.log(val);
   };
   const onLogout1 = () => {
-    window.FB.logout()
+    window.FB.login(function (response) {
+      console.log(response)
+
+    }, { scope: 'public_profile,email' })
+  }
+  const onLogout3 = () => {
+    window.FB.logout(function (response) {
+      console.log(response)
+    })
   }
   const responseGoogleOk = (val) => {
     const { tokenId, profileObj } = val;
@@ -205,14 +217,13 @@ const FormAlert = (props) => {
     console.log(val)
   }
   const responseFacebook = (val) => {
-    console.log(val);
+    // console.log(val);
     const { accessToken, name } = val;
     login(
       api.AUTH_GG_LOGIN,
       { accessToken: accessToken },
       { username: name }
     ).then((res) => {
-      // console.log(res);
       const { data, status } = res;
       switch (status) {
         case 200:
@@ -232,7 +243,7 @@ const FormAlert = (props) => {
           });
           break;
         default:
-          setMessageError(data.message);
+          props.handleOnModal(ERROR, data.message, status);
           break;
       }
     });
@@ -392,7 +403,8 @@ const FormAlert = (props) => {
       case "":
         return (
           <Row type="flex" justify="space-around" align="center">
-            <button onClick={onLogout1}>log</button>
+            {/* <button onClick={onLogout1}>log</button>
+            <button onClick={onLogout3}>log3</button> */}
             <img
               src={img["btn_login_clappi.png"]}
               className="btn-pointer btn_login"
@@ -415,9 +427,9 @@ const FormAlert = (props) => {
               />
             </GoogleLogin>
             <FacebookLogin
-              appId={socialId.facebookFakeId}
+              appId={socialId.facebook3qId}
               callback={responseFacebook}
-              autoLoad={demo}
+              autoLoad={false}
               render={(renderProps) => (
                 <img
                   src={img["btn_login_fb.png"]}
