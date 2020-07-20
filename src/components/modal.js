@@ -140,7 +140,6 @@ const FormAlert = (props) => {
     const { gameUserId, serverId, gameUserName, serverName } = convertValue;
     const positionUser = { id: index };
     getInfoSpin(positionUser).then((dataSpin) => {
-      // console.log(dataSpin);
       const { data, status } = dataSpin;
       if (status === 200) {
         const { currentTimes } = data;
@@ -156,10 +155,9 @@ const FormAlert = (props) => {
       }
     });
     getHistorySpin({ ...indexHistory, ...positionUser }).then((res) => {
-      // console.log(res);
       const { data, status } = res;
       if (status === 200) {
-        const { rows, count } = data.rewards;
+        const { rows, count } = data;
         setIndexHistory({ ...indexHistory, listHistory: rows, count: count });
       } else {
         props.handleOnModal(ERROR, data.message, status);

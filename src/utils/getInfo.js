@@ -35,6 +35,7 @@ const getHistorySpin = (params) => {
     return baseGetInfoCharacter
         .post(api.GET_HISTORY_SPIN, qs.stringify(params))
         .then((res) => {
+            // console.log(res)
             return res;
         })
         .catch((e) => {
