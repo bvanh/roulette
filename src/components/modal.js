@@ -22,10 +22,8 @@ import {
 import api from "../api/apiUrl";
 import GoogleLogin from "react-google-login";
 import FacebookLogin from "react-facebook-login/dist/facebook-login-render-props";
-// import { FacebookLogout } from 'react-facebook-login'
-import localStorageService from "../utils/localStorageService";
+import cookieService from "../utils/cookieService";
 import moment from "moment";
-import { VerticalAlignBottomOutlined } from "@ant-design/icons";
 const socialId = {
   googleClappiId:
     "1082828967661-iqn44j6piegilfd75p2718o71tdabe4e.apps.googleusercontent.com",
@@ -45,12 +43,13 @@ const {
 const layout = {
   labelCol: { span: 4 },
   wrapperCol: { span: 16 },
-  align:"center"
+  align: "center"
 };
 const FormAlert = (props) => {
   const { visible, isModal, message, status } = props.indexModal;
   const { prize, indexLogin, indexSpin } = props;
   const { gameUserName, serverName } = indexSpin;
+  const { count, listHistory, pageSize, currentPage } = props.indexHistory
   const [typeLogin, setTypeLogin] = useState({
     isTypeLogin: "",
     demo: false
@@ -63,15 +62,14 @@ const FormAlert = (props) => {
       screenName: "",
     },
   ]);
-  const [indexHistory, setIndexHistory] = useState({
-    pageSize: 10,
-    currentPage: 1,
-    count: null,
-    listHistory: [],
-  });
+  // const [indexHistory, setIndexHistory] = useState({
+  //   pageSize: 10,
+  //   currentPage: 1,
+  //   count: null,
+  //   listHistory: [],
+  // });
   const [messageError, setMessageError] = useState("");
   const { isTypeLogin, demo } = typeLogin;
-  const { listHistory, count, pageSize, currentPage } = indexHistory;
   useEffect(() => {
     switch (isModal) {
       case PICK_SERVER:
@@ -116,7 +114,7 @@ const FormAlert = (props) => {
     }
   };
   const logOut = () => {
-    localStorageService.resetToken();
+    cookieService.resetToken();
     props.setIndexLogin({ ...indexLogin, isLogin: false });
     props.handleOffModal();
     resetData();
@@ -154,15 +152,22 @@ const FormAlert = (props) => {
         props.handleOnModal(ERROR, data.message, status);
       }
     });
-    getHistorySpin({ ...indexHistory, ...positionUser }).then((res) => {
-      const { data, status } = res;
-      if (status === 200) {
-        const { rows, count } = data;
-        setIndexHistory({ ...indexHistory, listHistory: rows, count: count });
-      } else {
-        props.handleOnModal(ERROR, data.message, status);
-      }
-    });
+    // getHistorySpin({
+    //   ...props.indexHistory,...positionUser
+    // }).then((res) => {
+    //   // console.log(res);
+    //   const { data, status } = res;
+    //   if (status === 200) {
+    //     const { rows, count } = data;
+    //     props.setIndexHistory({
+    //       ...props.indexHistory,
+    //       listHistory: rows,
+    //       count: count,
+    //     });
+    //   } else {
+    //     props.handleOnModal(ERROR, data.message, status);
+    //   }
+    // });
   };
   const onFinishFailed = (val) => {
     console.log(val);
@@ -240,29 +245,7 @@ const FormAlert = (props) => {
       });
     }
   };
-  const onChangePageHistory = (val) => {
-    // console.log(val)
-    const { positionUser } = indexSpin;
-    getHistorySpin({
-      ...indexHistory,
-      id: positionUser,
-      currentPage: val,
-    }).then((res) => {
-      // console.log(res);
-      const { data, status } = res;
-      if (status === 200) {
-        const { rows, count } = data.rewards;
-        setIndexHistory({
-          ...indexHistory,
-          listHistory: rows,
-          count: count,
-          currentPage: val,
-        });
-      } else {
-        props.handleOnModal(ERROR, data.message, status);
-      }
-    });
-  };
+
   const onLogout = (val) => {
     console.log(val)
   }
@@ -339,7 +322,7 @@ const FormAlert = (props) => {
             <Pagination
               total={count}
               current={currentPage}
-              onChange={onChangePageHistory}
+              onChange={(val) => props.onChangePageHistory(val)}
               size="small"
             />
           </>
@@ -363,7 +346,7 @@ const FormAlert = (props) => {
       dataIndex: "createdDate",
       key: "time",
       render: (index) => (
-        <span>{moment(index).format("HH:ss DD/MM/YYYY")}</span>
+        <span>{moment(index).format("HH:mm DD/MM/YYYY")}</span>
       ),
     },
     {

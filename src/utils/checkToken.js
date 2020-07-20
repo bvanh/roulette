@@ -1,14 +1,14 @@
 
+
+import cookieServie from './cookieService'
 function checkAccessToken() {
     const currentTime = new Date().getTime();
-    const oldAccessToken = JSON.parse(
-        localStorage.getItem("accessTokenRoulette")
-    );
-    const tokenRoulette = JSON.parse(localStorage.getItem("tokenRoulette"));
+    const oldAccessToken = cookieServie.getAccessToken();
+    const tokenRoulette = cookieServie.getToken();
     const checkExpriedToken = currentTime - tokenRoulette?.timestamp > 75168000000;
     if (
-        oldAccessToken === null ||
-        tokenRoulette === null ||
+        oldAccessToken === undefined ||
+        tokenRoulette === undefined ||
         checkExpriedToken
     ) {
         return true;
@@ -17,4 +17,4 @@ function checkAccessToken() {
     }
 }
 
-export { checkAccessToken};
+export { checkAccessToken };

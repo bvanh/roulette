@@ -1,19 +1,13 @@
 import { baseLogin, baseGetInfoCharacter } from "../api/baseApi";
 import qs from "qs";
+import cookieService from "./cookieService";
 const login = (path, params, username) => {
     return baseLogin
         .post(path, qs.stringify(params))
         .then((response) => {
-            let userToken = { token: { ...response.data, ...username }, timestamp: new Date().getTime() };
-            let userAccessToken = {
-                accessToken: response.data.accessToken,
-                timestamp: new Date().getTime(),
-            };
-            localStorage.setItem("tokenRoulette", JSON.stringify(userToken));
-            localStorage.setItem(
-                "accessTokenRoulette",
-                JSON.stringify(userAccessToken)
-            );
+            // console.log(response)
+            const { data } = response
+            cookieService.setToken({ ...data, username: username.username }, data.accessToken)
             return response;
         })
         .catch((error) => {

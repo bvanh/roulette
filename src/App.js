@@ -4,8 +4,8 @@ import { Row, Col, message } from "antd";
 import { img } from "./utils/importImg";
 import FormAlert from "./components/modal";
 import { typeModal, rewards } from "./utils/indexModal";
-import localStorageService from "./utils/localStorageService";
-import { getResultSpin } from "./utils/getInfo";
+import cookieService from "./utils/cookieService";
+import { getResultSpin, getHistorySpin } from "./utils/getInfo";
 import { checkInfoSpin, listError } from "./utils/checkInfo";
 import { SwapOutlined, LogoutOutlined } from "@ant-design/icons";
 import "./App.scss";
@@ -36,8 +36,8 @@ function App() {
   });
   const [prize, setPrize] = useState([]);
   const [indexLogin, setIndexLogin] = useState({
-    isLogin: localStorageService.getToken() ? true : false,
-    userName: localStorageService.getToken()?.username,
+    isLogin: cookieService.getToken() ? true : false,
+    userName: cookieService.getToken()?.username,
     password: "",
   });
   const [indexSpin, setIndexSpin] = useState({
@@ -47,6 +47,12 @@ function App() {
     gameUserName: null,
     positionUser: null
   });
+  const [indexHistory, setIndexHistory] = useState({
+    pageSize: 10,
+    currentPage: 1,
+    count: null,
+    listHistory: [],
+  });
   const [reset, setReset] = useState(false);
   const { isSpin, disableButton } = mustSpin;
   const { gameUserName, serverName, currentTimesSpin, timesSpin, positionUser } = indexSpin;
@@ -55,7 +61,7 @@ function App() {
   let start = isSpin;
   useEffect(() => {
     if (checkAccessToken()) {
-      localStorageService.resetToken();
+      cookieService.resetToken();
       setIndexLogin({ ...indexLogin, isLogin: false });
     }
   }, []);
@@ -78,7 +84,7 @@ function App() {
       status: status
     });
   }
-  const handleOnModal = (isModal, message, status) => {
+  const handleOnModal = async (isModal, message, status) => {
     switch (isModal) {
       case HISTORY:
         switch (positionUser) {
@@ -86,6 +92,16 @@ function App() {
             handleOnModal(MESSEAGE, GAMEUSER_ERROR);
             break;
           default:
+            await getHistorySpin({ ...indexHistory, id: positionUser }).then((res) => {
+              // console.log(res)
+              const { data, status } = res;
+              if (status === 200) {
+                const { rows, count } = data;
+                setIndexHistory({ ...indexHistory, listHistory: rows, count: count });
+              } else {
+                handleOnModal(ERROR, data.message, status);
+              }
+            });
             setIndexOnModal(isModal, message, status)
             break;
         }
@@ -188,17 +204,42 @@ function App() {
         );
     }
   };
+  const onChangePageHistory = (val) => {
+    const { positionUser } = indexSpin;
+    getHistorySpin({
+      ...indexHistory,
+      id: positionUser,
+      currentPage: val,
+    }).then((res) => {
+      // console.log(res);
+      const { data, status } = res;
+      if (status === 200) {
+        const { rows, count } = data;
+        setIndexHistory({
+          ...indexHistory,
+          listHistory: rows,
+          count: count,
+          currentPage: val,
+        });
+      } else {
+        handleOnModal(ERROR, data.message, status);
+      }
+    });
+  };
   return (
     <div className="App">
       <FormAlert
         indexModal={indexModal}
         indexLogin={indexLogin}
+        indexHistory={indexHistory}
         prize={prize}
         indexSpin={indexSpin}
         handleOffModal={handleOffModal}
         handleOnModal={handleOnModal}
         setIndexLogin={setIndexLogin}
         setSpin={setIndexSpin}
+        setIndexHistory={setIndexHistory}
+        onChangePageHistory={onChangePageHistory}
       />
       <Row justify="center" className="btn-header">
         <Col
@@ -228,7 +269,7 @@ function App() {
           <img
             src={img["btn_history_event.png"]}
             onClick={() => handleOnModal(HISTORY)}
-            className="btn-pointer"
+            className={`btn-pointer ${disableButton}`}
             id="history-roulette"
           />
           <img
