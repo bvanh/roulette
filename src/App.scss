@@ -7,11 +7,11 @@ $mobile-width: 767px;
     @content;
   }
 }
-  // @mixin rwd($screen) {
-  //   @media (min-width: $screen+'px') {
-  //       @content;
-  //   }
-  // }
+// @mixin rwd($screen) {
+//   @media (min-width: $screen+'px') {
+//       @content;
+//   }
+// }
 p,
 label {
   font-family: "Roboto", sans-serif;
@@ -210,7 +210,6 @@ label {
     position: relative;
     overflow: hidden !important;
     text-overflow: ellipsis;
-    // display: -webkit-box;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 1;
     width: 75%;
