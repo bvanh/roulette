@@ -7,11 +7,6 @@ $mobile-width: 767px;
     @content;
   }
 }
-// @mixin rwd($screen) {
-//   @media (min-width: $screen+'px') {
-//       @content;
-//   }
-// }
 p,
 label {
   font-family: "Roboto", sans-serif;
